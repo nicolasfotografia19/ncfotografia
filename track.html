@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <title>Nicolás Fotografía - Fotos de Pista</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #000000; color: #ffffff; font-family: 'Inter', sans-serif; }
+    .font-serif { font-family: 'Playfair Display', serif; }
+    .masonry-grid { column-count: 1; column-gap: 1.5rem; }
+    @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
+    @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+    .masonry-item { break-inside: avoid; margin-bottom: 1.5rem; }
+    #lightbox { transition: opacity 0.3s ease; }
+    #lightbox.hidden { opacity: 0; pointer-events: none; }
+    #lightbox.visible { opacity: 1; pointer-events: auto; }
+    .no-select { -webkit-user-select: none; user-select: none; }
+    .img-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
+    @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    @keyframes splashOut { 0% { opacity: 1; pointer-events: auto; } 100% { opacity: 0; pointer-events: none; visibility: hidden; } }
+    .splash-hidden { animation: splashOut 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes progressBar { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .animate-progress { animation: progressBar 1.5s ease-in-out infinite; }
+    .masonry-item img { transition: filter 0.3s ease-out, transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0.9; will-change: filter, transform; transform: translateZ(0); }
+    .masonry-grid:hover .masonry-item img { filter: blur(5px) brightness(0.5); }
+    .masonry-grid .masonry-item:hover img { filter: blur(0px) brightness(1.1); transform: scale(1.05) translateZ(0); opacity: 1; }
+    .watermark-wrapper { position: relative; display: block; overflow: hidden; background: #111; }
+    .watermark-wrapper::after {
+      content: 'MUESTRA NO COMERCIAL';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      color: rgba(255, 255, 255, 0.2); font-size: 1.5rem; font-weight: 700;
+      letter-spacing: 0.2em; white-space: nowrap; z-index: 10;
+      pointer-events: auto; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .watermark-wrapper img { pointer-events: none; user-select: none; -webkit-user-drag: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-white/20">
+  
+  <div id="menu-contenedor"></div>
+
+  <main class="flex-1 w-full max-w-7xl mx-auto p-6 md:p-12">
+    <div id="tab-track" class="block h-full flex-col">
+      <header class="mb-16">
+        <h2 class="text-[42px] font-serif font-light leading-none text-white italic">Solicitar Fotos de Pista</h2>
+        <p class="text-[11px] uppercase tracking-[0.4em] opacity-40 mt-4">Encuentra tus fotos del track day</p>
+      </header>
+      <div class="max-w-2xl bg-[#111] border border-white/10 p-8 md:p-12">
+        <form action="https://formspree.io/f/xwlkwdye" method="POST" class="space-y-8">
+          <div>
+            <label for="name" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Nombre Completo</label>
+            <input type="text" id="name" name="name" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="Tu nombre">
+          </div>
+          
+          <div>
+            <label for="email" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Email</label>
+            <input type="email" id="email" name="email" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="tu@email.com">
+          </div>
+          
+          <div>
+            <label for="event" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Evento</label>
+            <select id="event" name="event" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
+              <option value="" disabled selected class="text-black">Selecciona un evento</option>
+              <option value="Track Day San Nicolás" class="text-black">Track Day San Nicolás</option>
+              <option value="Track Day Buenos Aires" class="text-black">Track Day Buenos Aires</option>
+              <option value="Otro" class="text-black">Otro (especificar en mensaje)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="car_details" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Modelo de Auto o Número de Puerta</label>
+            <input type="text" id="car_details" name="car_details" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="Ej: VW Golf GTI / #45">
+          </div>
+          
+          <button type="submit" class="mt-8 w-full py-4 px-6 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#E5E5E5] transition-colors">
+            Enviar Solicitud
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+  
+  <script src="/fetch-menu.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+<header class="w-full bg-[#000000] pt-12 pb-8 flex flex-col items-center border-b border-white/10 shrink-0">
+  <div class="cursor-pointer mb-8 flex justify-center w-full">
+    <a href="/index.html">
+      <img src="/logo.svg" alt="Nicolás Fotografía" class="h-16 md:h-20 object-contain">
+    </a>
+  </div>
+  
+  <nav class="flex space-x-8 md:space-x-12">
+    <a href="/index.html" class="nav-link text-sm tracking-[0.2em] uppercase font-sans transition-all text-gray-300 hover:text-white" data-path="/">Work</a>
+    <a href="/track.html" class="nav-link text-sm tracking-[0.2em] uppercase font-sans transition-all text-gray-300 hover:text-white" data-path="/track.html">Fotos de Pista</a>
+    <a href="/seleccion.html" class="nav-link text-sm tracking-[0.2em] uppercase font-sans transition-all text-gray-300 hover:text-white" data-path="/seleccion.html">Selección</a>
+    <a href="/contacto.html" class="nav-link text-sm tracking-[0.2em] uppercase font-sans transition-all text-gray-300 hover:text-white" data-path="/contacto.html">Contact</a>
+  </nav>
+
+  <script>
+    // Highlight the active tab based on the current URL
+    (function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link');
+      
+      navLinks.forEach(link => {
+        // Strict match for root
+        if (link.dataset.path === '/' && (currentPath === '/' || currentPath === '/index.html' || currentPath === '')) {
+          link.classList.remove('text-gray-300', 'hover:text-white');
+          link.classList.add('text-white', 'font-medium');
+        } else if (link.dataset.path !== '/' && currentPath.includes(link.dataset.path)) {
+          link.classList.remove('text-gray-300', 'hover:text-white');
+          link.classList.add('text-white', 'font-medium');
+        }
+      });
+    })();
+  </script>
+</header>

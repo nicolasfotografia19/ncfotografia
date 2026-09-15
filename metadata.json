@@ -1,0 +1,8 @@
+{
+  "name": "Nicolás Fotografía - Portafolio",
+  "description": "Portafolio fotográfico minimalista con integración automatizada del feed de Instagram.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
