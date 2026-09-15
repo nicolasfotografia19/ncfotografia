@@ -181,6 +181,11 @@
     async function loadInstagramFeed() {
       const container = document.getElementById('gallery-container');
       const loading = document.getElementById('loading-indicator');
+      const splashScreen = document.getElementById('splash-screen');
+      const finishLoading = () => {
+        if (loading) loading.style.display = 'none';
+        if (splashScreen) splashScreen.classList.add('splash-hidden');
+      };
       
       try {
         const res = await fetch(CURATOR_URL);
@@ -189,32 +194,29 @@
         
         if (data && data.success === false) throw new Error("Error en la API de Curator");
         
-        const posts = Array.isArray(data) ? data : (data.posts || []);
-        if (!posts || posts.length === 0) return;
-        
-        if(loading) loading.style.display = 'none';
+        const posts = Array.isArray(data) ? data : (Array.isArray(data.posts) ? data.posts : []);
+        if (posts.length === 0) {
+          throw new Error('No hay publicaciones disponibles en este momento.');
+        }
         
         mediaData = posts;
         renderFilteredGallery();
-        
-        setTimeout(() => {
-          document.getElementById('splash-screen').classList.add('splash-hidden');
-        }, 800);
+        setTimeout(finishLoading, 800);
 
       } catch (err) {
         console.error('Error Curator:', err);
-        if(loading) loading.style.display = 'none';
-        setTimeout(() => {
-          document.getElementById('splash-screen').classList.add('splash-hidden');
-        }, 500);
-        container.innerHTML = `
-          <div class="col-span-full max-w-2xl mx-auto py-12 px-8 bg-[#111] border border-white/10 mt-8 text-center">
-            <h2 class="text-[28px] font-serif font-light italic text-white mb-4">Portafolio no disponible</h2>
-            <p class="text-[#E5E5E5] opacity-60 mb-8 leading-relaxed font-light text-sm">
-              Error al conectar con Instagram: ${err.message}
-            </p>
-          </div>
-        `;
+        setTimeout(finishLoading, 500);
+        container.replaceChildren();
+        const message = document.createElement('div');
+        message.className = 'max-w-2xl mx-auto py-12 px-8 bg-[#111] border border-white/10 mt-8 text-center';
+        const heading = document.createElement('h2');
+        heading.className = 'text-[28px] font-serif font-light italic text-white mb-4';
+        heading.textContent = 'Portafolio no disponible';
+        const detail = document.createElement('p');
+        detail.className = 'text-[#E5E5E5] opacity-60 leading-relaxed font-light text-sm';
+        detail.textContent = `Error al conectar con Instagram: ${err.message}`;
+        message.append(heading, detail);
+        container.appendChild(message);
       }
     }
 

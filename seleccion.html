@@ -214,6 +214,9 @@ ${textList}`
            actionBar.classList.add('translate-y-full');
         }
         
+        if (!Array.isArray(data)) {
+          throw new Error('La respuesta del servicio de fotos no tiene el formato esperado.');
+        }
         renderSelectionGallery(data);
       } catch (err) {
         console.error('Error fetching drive photos:', err);
