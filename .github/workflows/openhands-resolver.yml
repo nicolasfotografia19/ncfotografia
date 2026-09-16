@@ -26,7 +26,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install OpenHands Resolver
-        run: pip install openhands-resolver
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install openhands-resolver
 
       - name: Run OpenHands Resolver
         env:
