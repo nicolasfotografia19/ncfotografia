@@ -11,6 +11,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  packages: read
 
 jobs:
   resolve-issue:
@@ -19,6 +20,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run OpenHands Resolver via Docker
         env:
