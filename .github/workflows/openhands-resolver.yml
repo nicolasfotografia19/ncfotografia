@@ -40,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_MODEL: "gemini/gemini-1.5-flash"
+          LLM_MODEL: "gemini/gemini-1.5-pro"
         run: |
           TARGET_ISSUE="${{ inputs.issue_number || github.event.issue.number }}"
           python -m openhands_resolver.resolve_issue --repo "${{ github.repository }}" --issue-number "$TARGET_ISSUE"
