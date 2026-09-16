@@ -6,7 +6,7 @@ on:
       issue_number:
         description: "Número de Issue a resolver (ej. 1, 2, 3)"
         required: true
-        default: "1"
+        default: "3"
   issues:
     types: [opened, labeled]
   issue_comment:
@@ -39,7 +39,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_MODEL: "gemini/gemini-1.5-pro"
+          LLM_MODEL: "gemini/gemini-pro"
         run: |
           TARGET_ISSUE="${{ inputs.issue_number || github.event.issue.number }}"
           python -m openhands_resolver.resolve_issue --repo "${{ github.repository }}" --issue-number "$TARGET_ISSUE"
