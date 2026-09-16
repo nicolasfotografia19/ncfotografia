@@ -28,8 +28,7 @@ jobs:
       - name: Install OpenHands Resolver
         run: |
           python -m pip install --upgrade pip
-          pip install --no-deps openhands-resolver openhands-ai
-          pip install litellm pygithub pydantic requests python-dotenv PyJWT termcolor jinja2
+          pip install "e2b==0.17.1" openhands-resolver
 
       - name: Run OpenHands Resolver
         env:
