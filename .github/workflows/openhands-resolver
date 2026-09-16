@@ -14,10 +14,7 @@ permissions:
 jobs:
   resolve-issue:
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request == null && (contains(github.event.issue.labels.*.name, 'fix-me') || contains(github.event.comment.body, '@openhands-agent'))
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    if: github.event.issue.pull_request == null && (contains(github.event.issue.labels.*.name, 'fix-me') || contains(github.event.issue.body, '@openhands-agent') || contains(github.event.comment.body, '@openhands-agent'))
 
       - name: Run OpenHands Resolver
         uses: All-Hands-AI/openhands-resolver@v1
