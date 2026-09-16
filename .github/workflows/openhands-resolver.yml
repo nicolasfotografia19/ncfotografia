@@ -38,4 +38,4 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           ISSUE_TO_RUN=${ISSUE_NUMBER:-1}
-          python -m openhands_resolver.resolve_issue --issue-number "$ISSUE_TO_RUN"
+          python -m openhands_resolver.resolve_issue --repo "${{ github.repository }}" --issue-number "$ISSUE_TO_RUN"
