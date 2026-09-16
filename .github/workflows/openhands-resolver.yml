@@ -20,17 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install OpenHands Resolver
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-          pip install openhands-resolver
-
-      - name: Run OpenHands Resolver
+      - name: Run OpenHands Resolver via Docker
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -38,4 +28,10 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           ISSUE_TO_RUN=${ISSUE_NUMBER:-1}
-          python -m openhands_resolver.resolve_issue --issue-number "$ISSUE_TO_RUN"
+          docker run --rm \
+            -e GITHUB_TOKEN="$GITHUB_TOKEN" \
+            -e LLM_API_KEY="$LLM_API_KEY" \
+            -e LLM_MODEL="$LLM_MODEL" \
+            -v $(pwd):/workspace \
+            ghcr.io/all-hands-ai/openhands-resolver:latest \
+            python -m openhands_resolver.resolve_issue --issue-number "$ISSUE_TO_RUN" --repo-path /workspace
