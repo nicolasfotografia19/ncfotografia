@@ -20,9 +20,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run OpenHands Resolver
-        uses: All-Hands-AI/openhands-resolver@main
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          llm_api_key: ${{ secrets.LLM_API_KEY }}
-          llm_model: "gemini/gemini-1.5-pro"
+          python-version: "3.11"
+
+      - name: Install OpenHands Resolver
+        run: pip install openhands-resolver
+
+      - name: Run OpenHands Resolver
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_MODEL: "gemini/gemini-1.5-pro"
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          ISSUE_TO_RUN=${ISSUE_NUMBER:-1}
+          python -m openhands_resolver.resolve_issue --issue-number "$ISSUE_TO_RUN"
