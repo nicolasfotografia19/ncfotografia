@@ -1,0 +1,27 @@
+name: OpenHands Resolver
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  resolve-issue:
+    runs-on: ubuntu-latest
+    if: github.event.issue.pull_request == null && (contains(github.event.issue.labels.*.name, 'fix-me') || contains(github.event.comment.body, '@openhands-agent'))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run OpenHands Resolver
+        uses: All-Hands-AI/openhands-resolver@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          llm_api_key: ${{ secrets.LLM_API_KEY }}
+          llm_model: "gemini/gemini-1.5-pro"
