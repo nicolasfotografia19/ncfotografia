@@ -36,13 +36,13 @@ jobs:
           pip install "e2b==0.17.1" openhands-resolver
 
       - - name: Run OpenHands Resolver
-         env:
+          env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_MODEL: "gemini/gemini-1.5-flash-latest"
           MODEL: "gemini/gemini-1.5-flash-latest"
           LITELLM_LOG: "DEBUG"
-         run: |
+          run: |
           TARGET_ISSUE="${{ inputs.issue_number || github.event.issue.number }}"
           python -m openhands_resolver.resolve_issue --repo "${{ github.repository }}" --issue-number "$TARGET_ISSUE"
