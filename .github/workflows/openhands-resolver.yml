@@ -41,6 +41,6 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_MODEL: "gemini/gemini-1.5-flash-latest"
-        run: |
-          TARGET_ISSUE="${{ inputs.issue_number || github.event.issue.number }}"
+          MODEL: "gemini/gemini-1.5-flash-latest"
+          LITELLM_LOG: "DEBUG"ts.issue_number || github.event.issue.number }}"
           python -m openhands_resolver.resolve_issue --repo "${{ github.repository }}" --issue-number "$TARGET_ISSUE"
