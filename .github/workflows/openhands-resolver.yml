@@ -40,8 +40,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_MODEL: "gemini/gemini-1.5-flash"
-          MODEL: "gemini/gemini-1.5-flash"
+          LLM_MODEL: "gemini/gemini-2.5-flash"
+          MODEL: "gemini/gemini-2.5-flash"
           LITELLM_LOG: "DEBUG"
         run: |
           TARGET_ISSUE="${{ inputs.issue_number || github.event.issue.number }}"
