@@ -1,94 +1,244 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nicolás Fotografía - Solicita tus fotografías de Track Days y jornadas en pista.">
+  <meta name="theme-color" content="#030305">
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
-  <title>Nicolás Fotografía - Fotos de Pista</title>
+  <title>Nicolás Fotografía — ¿Tenés fotos de mi auto?</title>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+  <!-- Sentry Error Monitoring -->
+  <script
+    src="https://js.sentry-cdn.com/aa1a112752bd8b5e25dfec3fd75b0eb8.min.js"
+    crossorigin="anonymous"
+  ></script>
+
   <style>
-    body { background-color: #000000; color: #ffffff; font-family: 'Inter', sans-serif; }
-    .font-serif { font-family: 'Playfair Display', serif; }
-    .masonry-grid { column-count: 1; column-gap: 1.5rem; }
-    @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
-    @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
-    .masonry-item { break-inside: avoid; margin-bottom: 1.5rem; }
-    #lightbox { transition: opacity 0.3s ease; }
-    #lightbox.hidden { opacity: 0; pointer-events: none; }
-    #lightbox.visible { opacity: 1; pointer-events: auto; }
-    .no-select { -webkit-user-select: none; user-select: none; }
-    .img-overlay { position: absolute; inset: 0; z-index: 10; background: transparent; }
-    @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-    .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-    @keyframes splashOut { 0% { opacity: 1; pointer-events: auto; } 100% { opacity: 0; pointer-events: none; visibility: hidden; } }
-    .splash-hidden { animation: splashOut 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes progressBar { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-    .animate-progress { animation: progressBar 1.5s ease-in-out infinite; }
-    .masonry-item img { transition: filter 0.3s ease-out, transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0.9; will-change: filter, transform; transform: translateZ(0); }
-    .masonry-grid:hover .masonry-item img { filter: blur(5px) brightness(0.5); }
-    .masonry-grid .masonry-item:hover img { filter: blur(0px) brightness(1.1); transform: scale(1.05) translateZ(0); opacity: 1; }
-    .watermark-wrapper { position: relative; display: block; overflow: hidden; background: #111; }
-    .watermark-wrapper::after {
-      content: 'MUESTRA NO COMERCIAL';
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotate(-45deg);
-      color: rgba(255, 255, 255, 0.2); font-size: 1.5rem; font-weight: 700;
-      letter-spacing: 0.2em; white-space: nowrap; z-index: 10;
-      pointer-events: auto; width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
+    :root { color-scheme: dark; }
+    body {
+      background-color: #030305;
+      background-image: 
+        radial-gradient(circle at 50% -10%, rgba(35, 35, 45, 0.45) 0%, transparent 60%),
+        radial-gradient(circle at 90% 70%, rgba(20, 20, 28, 0.25) 0%, transparent 50%);
+      background-attachment: fixed;
+      color: #f4f4f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    .watermark-wrapper img { pointer-events: none; user-select: none; -webkit-user-drag: none; }
+    .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+    
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(18px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up {
+      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    select option {
+      background-color: #0b0b0e;
+      color: #ffffff;
+      padding: 10px;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-white/20">
+<body class="min-h-screen flex flex-col selection:bg-white selection:text-black relative">
   
+  <!-- Textura de Grano Analógico 35mm -->
+  <div class="fixed inset-0 pointer-events-none z-50 opacity-[0.038] mix-blend-screen" 
+       style="background-image: url('data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E'); background-repeat: repeat;">
+  </div>
+
+  <!-- Viñeta de Lente -->
+  <div class="fixed inset-0 pointer-events-none z-40 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)]"></div>
+
+  <!-- Navegación Global -->
   <div id="menu-contenedor"></div>
 
-  <main class="flex-1 w-full max-w-7xl mx-auto p-6 md:p-12">
-    <div id="tab-track" class="block h-full flex-col">
-      <header class="mb-16">
-        <h2 class="text-[42px] font-serif font-light leading-none text-white italic">Solicitar Fotos de Pista</h2>
-        <p class="text-[11px] uppercase tracking-[0.4em] opacity-40 mt-4">Encuentra tus fotos del track day</p>
-      </header>
-      <div class="max-w-2xl bg-[#111] border border-white/10 p-8 md:p-12">
-        <form action="https://formspree.io/f/xwlkwdye" method="POST" class="space-y-8">
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 md:px-12 md:py-16 relative z-10">
+    <div id="tab-track" class="block h-full animate-fade-up">
+      
+      <!-- Disposición Equilibrada en 2 Columnas -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start pt-4">
+        
+        <!-- Columna Izquierda: Información Editorial -->
+        <div class="lg:col-span-5 space-y-8">
           <div>
-            <label for="name" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Nombre Completo</label>
-            <input type="text" id="name" name="name" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="Tu nombre">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="inline-block w-8 h-[1px] bg-white/40"></span>
+              <span class="text-[10px] uppercase tracking-[0.4em] text-zinc-400 font-mono">Automovilismo & Track Days</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-light leading-tight text-white tracking-tight">
+              ¿Tenés fotos de <span class="italic font-normal text-white/90">mi auto?</span>
+            </h1>
+            <p class="text-xs md:text-sm text-zinc-400 font-light mt-6 leading-relaxed">
+              Si participaste en una tanda en San Nicolás, Buenos Aires, Speed Club o Drift, ingresá los datos de tu auto y número para rastrear todas tus tomas en pista.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-sm bg-white/[0.02] border border-white/[0.06] space-y-3">
+            <span class="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-mono block">¿Búsqueda urgente?</span>
+            <p class="text-xs text-zinc-400 font-light leading-relaxed">
+              También podés enviarme directamente una foto de tu auto por WhatsApp para ubicarlo de inmediato en las carpetas de la tanda.
+            </p>
+            <a href="https://wa.me/5492235468630" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white hover:text-zinc-300 font-medium pt-2 transition-colors">
+              <span>Contactar por WhatsApp &rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Formulario Editorial -->
+        <div class="lg:col-span-7 bg-[#070709] border border-white/[0.08] p-8 md:p-12 shadow-2xl relative rounded-sm">
+          <form 
+            id="track-form"
+            action="https://formspree.io/f/xwlkwdye" 
+            method="POST" 
+            class="space-y-8"
+          >
+          <div class="relative">
+            <label for="name" class="block text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2 font-mono">Nombre Completo</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              required 
+              class="w-full bg-transparent border-b border-white/15 py-3 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-white transition-colors" 
+              placeholder="Tu nombre y apellido"
+            >
           </div>
           
-          <div>
-            <label for="email" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Email</label>
-            <input type="email" id="email" name="email" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="tu@email.com">
+          <div class="relative">
+            <label for="email" class="block text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2 font-mono">Email de Contacto</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              class="w-full bg-transparent border-b border-white/15 py-3 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-white transition-colors" 
+              placeholder="tu@email.com"
+            >
           </div>
           
-          <div>
-            <label for="event" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Evento</label>
-            <select id="event" name="event" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer">
-              <option value="" disabled selected class="text-black">Selecciona un evento</option>
-              <option value="Track Day San Nicolás" class="text-black">Track Day San Nicolás</option>
-              <option value="Track Day Buenos Aires" class="text-black">Track Day Buenos Aires</option>
-              <option value="Otro" class="text-black">Otro (especificar en mensaje)</option>
-            </select>
+          <div class="relative">
+            <label for="event" class="block text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2 font-mono">Fecha / Evento</label>
+            <div class="relative">
+              <select 
+                id="event" 
+                name="event" 
+                required 
+                class="w-full bg-transparent border-b border-white/15 py-3 text-white text-sm focus:outline-none focus:border-white transition-colors appearance-none cursor-pointer pr-8"
+              >
+                <option value="" disabled selected class="text-zinc-500">Selecciona una jornada</option>
+                <option value="Track Day San Nicolás">Track Day San Nicolás</option>
+                <option value="Track Day Buenos Aires">Track Day Buenos Aires</option>
+                <option value="Speed Club">Speed Club</option>
+                <option value="Drift Sudamérica">Drift</option>
+                <option value="Otro">Otro evento (especificar en mensaje)</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center text-zinc-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </div>
           </div>
           
-          <div>
-            <label for="car_details" class="block text-[10px] uppercase tracking-[0.3em] text-white/50 mb-3">Modelo de Auto o Número de Puerta</label>
-            <input type="text" id="car_details" name="car_details" required class="w-full bg-transparent border-b border-white/20 px-0 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="Ej: VW Golf GTI / #45">
+          <div class="relative">
+            <label for="car_details" class="block text-[10px] uppercase tracking-[0.25em] text-zinc-400 mb-2 font-mono">Modelo de Auto y Número de Puerta</label>
+            <input 
+              type="text" 
+              id="car_details" 
+              name="car_details" 
+              required 
+              class="w-full bg-transparent border-b border-white/15 py-3 text-white placeholder-zinc-600 text-sm focus:outline-none focus:border-white transition-colors" 
+              placeholder="Ej: BMW M3 E46 Azul / #88"
+            >
           </div>
           
-          <button type="submit" class="mt-8 w-full py-4 px-6 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#E5E5E5] transition-colors">
-            Enviar Solicitud
-          </button>
+          <div class="pt-4">
+            <button 
+              type="submit" 
+              id="submit-btn"
+              class="w-full py-4 px-6 bg-white hover:bg-zinc-200 text-black text-[10px] uppercase tracking-[0.25em] font-semibold transition-all duration-300 shadow-md flex items-center justify-center gap-2"
+            >
+              <span>Enviar Solicitud</span>
+            </button>
+          </div>
+
+          <div id="form-status" class="hidden text-xs py-3.5 px-4 text-center rounded-sm"></div>
         </form>
       </div>
     </div>
-  </main>
+  </div>
+</main>
   
+  <!-- Footer Editorial -->
+  <footer class="w-full border-t border-white/[0.08] bg-[#030305]/95 mt-24 py-12 md:py-16 text-zinc-500 relative z-10">
+    <div class="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <img src="/logo.svg" alt="Nicolás" class="h-6 w-auto opacity-70">
+          <span class="text-xs uppercase tracking-[0.3em] text-white font-medium">Nicolás Fotografía</span>
+        </div>
+        <p class="text-[11px] font-light text-zinc-500 max-w-sm">
+          Coberturas fotográficas automotrices y jornadas en autódromos nacionales.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-8 text-[10px] uppercase tracking-[0.25em] font-mono">
+        <a href="https://wa.me/5492235468630" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">WhatsApp</a>
+        <span class="text-zinc-600">&copy; 2026</span>
+      </div>
+    </div>
+  </footer>
+
   <script src="/fetch-menu.js"></script>
 
+  <script>
+    const form = document.getElementById('track-form');
+    const statusDiv = document.getElementById('form-status');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span>Enviando solicitud...</span>';
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          form.reset();
+          statusDiv.className = 'block text-xs py-3.5 px-4 text-center bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 font-light';
+          statusDiv.textContent = '¡Solicitud enviada con éxito! Te contactaremos con el material encontrado.';
+        } else {
+          statusDiv.className = 'block text-xs py-3.5 px-4 text-center bg-red-950/40 border border-red-500/30 text-red-300 font-light';
+          statusDiv.textContent = 'Ocurrió un error al enviar. Por favor intenta de nuevo.';
+        }
+      } catch (err) {
+        statusDiv.className = 'block text-xs py-3.5 px-4 text-center bg-red-950/40 border border-red-500/30 text-red-300 font-light';
+        statusDiv.textContent = 'Error de conexión con el servidor.';
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

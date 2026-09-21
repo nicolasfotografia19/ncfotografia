@@ -1,3 +1,35 @@
 [build]
   command = "npm run build"
   publish = "dist"
+
+# Headers de Seguridad y Rendimiento
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Caché agresiva para bundles compilados por Vite (Inmutables con Hash)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Caché moderada para imágenes y SVG estáticos
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+# Reglas de redirección limpia para extensiones HTML
+[[redirects]]
+  from = "/work"
+  to = "/index.html"
+  status = 301
+
+[[redirects]]
+  from = "/sobre-mi"
+  to = "/contacto.html"
+  status = 301

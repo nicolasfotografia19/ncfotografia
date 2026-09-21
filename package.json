@@ -1,14 +1,12 @@
 {
-  "name": "nicolas-fotografia-static",
+  "name": "ncfotografia",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "jsdom": "^30.0.1"
+    "preview": "vite preview",
+    "serve": "node server.js"
   },
   "devDependencies": {
     "vite": "^5.0.0"

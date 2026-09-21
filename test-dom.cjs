@@ -1,9 +1,32 @@
 const fs = require('fs');
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
 
-const html = fs.readFileSync('index.html', 'utf8');
-const dom = new JSDOM(html, { runScripts: "dangerously" });
-setTimeout(() => {
-    console.log(dom.window.document.getElementById('gallery-container').innerHTML);
-}, 2000);
+try {
+  const html = fs.readFileSync('index.html', 'utf8');
+  
+  const requiredElements = [
+    'gallery-container',
+    'lightbox',
+    'menu-contenedor',
+    'loading-indicator'
+  ];
+
+  let allFound = true;
+  requiredElements.forEach(id => {
+    if (html.includes(`id="${id}"`)) {
+      console.log(`✅ Elemento #${id} presente`);
+    } else {
+      console.error(`❌ Falta el elemento crítico #${id}`);
+      allFound = false;
+    }
+  });
+
+  if (allFound) {
+    console.log("Estructura DOM verificada exitosamente.");
+    process.exit(0);
+  } else {
+    process.exit(1);
+  }
+} catch (e) {
+  console.error("Error al leer index.html:", e);
+  process.exit(1);
+}
