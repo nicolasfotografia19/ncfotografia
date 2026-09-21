@@ -2,17 +2,15 @@
  * Nicolás Fotografía - Cargador de Menú con Cache y Detección de Página Activa
  */
 (function () {
+  const CACHE_KEY = 'ncfotografia_menu_html_v4';
   const CACHE_KEY = 'ncfotografia_menu_html_v5';
-
   function setupMenu(container) {
     const currentPath = window.location.pathname;
     const navLinks = container.querySelectorAll('.nav-link');
-
     navLinks.forEach(link => {
       const dataPath = link.getAttribute('data-path');
       const isHome = (currentPath === '/' || currentPath === '/index.html' || currentPath === '') && dataPath === '/';
       const isMatch = dataPath !== '/' && currentPath.includes(dataPath.replace('/', ''));
-
       if (isHome || isMatch) {
         link.classList.remove('text-zinc-400');
         link.classList.add('text-white', 'font-medium');
@@ -26,12 +24,10 @@
         link.classList.remove('text-white', 'font-medium');
       }
     });
-
     // Control Móvil
     const toggleBtn = container.querySelector('#mobile-menu-toggle');
     const drawer = container.querySelector('#mobile-menu-drawer');
     const closeBtn = container.querySelector('#mobile-menu-close');
-
     if (toggleBtn && drawer) {
       toggleBtn.addEventListener('click', () => {
         drawer.classList.remove('hidden');
@@ -45,23 +41,13 @@
       }
     }
   }
-
   function render(html) {
     const container = document.getElementById('menu-contenedor');
     if (!container) return;
     container.innerHTML = html;
     setupMenu(container);
   }
-
   async function loadMenu() {
-    const cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) {
-      render(cached);
-      return;
-    }
-
-    try {
-      const res = await fetch('/menu.html');
       if (!res.ok) throw new Error('Menu no disponible');
       const html = await res.text();
       sessionStorage.setItem(CACHE_KEY, html);
