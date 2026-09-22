@@ -26,6 +26,18 @@
     @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
     @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
     .masonry-item { break-inside: avoid; margin-bottom: 2rem; display: block; }
+
+    /* Ajustes para evitar solapamientos visuales */
+    main {
+      position: relative;
+      display: block;
+    }
+    #menu-contenedor, footer {
+      position: relative;
+      width: 100%;
+      display: block;
+      z-index: 20;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col relative">
@@ -73,5 +85,12 @@
 
   <script src="/fetch-menu.js"></script>
   <script src="/script1.js"></script>
+
+  <!-- Bloqueo de clic derecho -->
+  <script>
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+  </script>
 </body>
 </html>
