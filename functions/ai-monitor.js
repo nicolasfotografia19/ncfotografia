@@ -105,9 +105,75 @@ export async function onRequestGet(context) {
       privateKey
     );
 
-    // 2. Obtener token de instalación
+    // 2. Obtener las instalaciones actuales
+    const installationsResponse = await fetch(
+      "https://api.github.com/app/installations",
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "User-Agent": "NC-Fotografia-AI-Resolver"
+        }
+      }
+    );
+
+    const installationsData =
+      await installationsResponse.json();
+
+    if (!installationsResponse.ok) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          step: "list_installations",
+          githubStatus: installationsResponse.status,
+          error: installationsData
+        }),
+        {
+          status: installationsResponse.status,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    // 3. Buscar la instalación de nuestra cuenta
+    const installation =
+      installationsData.find(
+        (item) =>
+          item.account?.login ===
+          "nicolasfotografia19"
+      );
+
+    if (!installation) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          message:
+            "No se encontró una instalación de la GitHub App para nicolasfotografia19.",
+          installations:
+            installationsData.map((item) => ({
+              id: item.id,
+              account: item.account?.login,
+              repositorySelection:
+                item.repository_selection
+            }))
+        }),
+        {
+          status: 404,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    const installationId = installation.id;
+
+    // 4. Obtener token de instalación
     const tokenResponse = await fetch(
-      "https://api.github.com/app/installations/164618009/access_tokens",
+      `https://api.github.com/app/installations/${installationId}/access_tokens`,
       {
         method: "POST",
         headers: {
@@ -127,7 +193,8 @@ export async function onRequestGet(context) {
           ok: false,
           step: "installation_token",
           githubStatus: tokenResponse.status,
-          error: tokenData
+          error: tokenData,
+          installationId
         }),
         {
           status: tokenResponse.status,
@@ -140,8 +207,7 @@ export async function onRequestGet(context) {
 
     const installationToken = tokenData.token;
 
-    // 3. Consultar los repositorios disponibles
-    // para esta instalación
+    // 5. Consultar los repositorios disponibles
     const repositoriesResponse = await fetch(
       "https://api.github.com/installation/repositories",
       {
@@ -163,7 +229,8 @@ export async function onRequestGet(context) {
           ok: false,
           step: "installation_repositories",
           githubStatus: repositoriesResponse.status,
-          error: repositoriesData
+          error: repositoriesData,
+          installationId
         }),
         {
           status: repositoriesResponse.status,
@@ -174,7 +241,7 @@ export async function onRequestGet(context) {
       );
     }
 
-    // Buscar nuestro repositorio
+    // 6. Buscar nuestro repositorio
     const repository =
       repositoriesData.repositories?.find(
         (repo) =>
@@ -188,6 +255,7 @@ export async function onRequestGet(context) {
           ok: false,
           message:
             "La GitHub App está instalada, pero no encuentra el repositorio ncfotografia.",
+          installationId,
           repositories:
             repositoriesData.repositories?.map(
               (repo) => repo.full_name
@@ -202,7 +270,7 @@ export async function onRequestGet(context) {
       );
     }
 
-    // 4. Devolver únicamente información segura
+    // 7. Devolver información segura
     return new Response(
       JSON.stringify({
         ok: true,
@@ -212,7 +280,7 @@ export async function onRequestGet(context) {
         private: repository.private,
         defaultBranch: repository.default_branch,
         permissions: repository.permissions,
-        installationId: 164618009
+        installationId
       }),
       {
         status: 200,
