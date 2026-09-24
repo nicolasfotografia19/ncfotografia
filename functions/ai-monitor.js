@@ -1,128 +1,47 @@
-export async function onRequestPost(context) {
+export async function onRequestGet(context) {
   try {
-    const sentryPayload = await context.request.json();
-    const errorDetails = sentryPayload.event || {};
+    const appId = context.env.GITHUB_APP_ID;
+    const privateKey = context.env.GITHUB_PRIVATE_KEY;
 
-    const errorMessage =
-      errorDetails.message ||
-      errorDetails.exception?.values?.[0]?.value ||
-      "Error desconocido";
-
-    const errorStack =
-      errorDetails.exception?.values?.[0]?.stacktrace?.frames?.slice(-5) || [];
-
-    const apiKey = context.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
+    if (!appId || !privateKey) {
       return new Response(
         JSON.stringify({
-          status: "Error de configuración",
-          message: "GEMINI_API_KEY no está disponible",
+          ok: false,
+          error: "Faltan GITHUB_APP_ID o GITHUB_PRIVATE_KEY"
         }),
         {
           status: 500,
           headers: {
-            "Content-Type": "application/json",
-          },
+            "Content-Type": "application/json"
+          }
         }
       );
     }
-
-    const prompt = `
-Actúa como un desarrollador frontend experto.
-
-Ocurrió un error en mi sitio web de fotografía.
-
-MENSAJE:
-${errorMessage}
-
-STACK TRACE:
-${JSON.stringify(errorStack, null, 2)}
-
-Analiza el error y responde en español.
-
-Usa exactamente este formato:
-
-CAUSA:
-[causa raíz]
-
-SIMPLE:
-[true o false]
-
-SOLUCIÓN:
-[explicación y código corregido si corresponde]
-`;
-
-    const geminiResponse = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
-
-    const aiData = await geminiResponse.json();
-
-    if (!geminiResponse.ok) {
-      return new Response(
-        JSON.stringify({
-          status: "Error detallado de Google",
-          httpStatus: geminiResponse.status,
-          errorMensajeExacto:
-            aiData.error?.message || JSON.stringify(aiData),
-        }),
-        {
-          status: geminiResponse.status,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-
-    const analysis =
-      aiData.candidates?.[0]?.content?.parts
-        ?.map((part) => part.text || "")
-        .join("\n") ||
-      "Gemini no devolvió ningún análisis.";
 
     return new Response(
       JSON.stringify({
-        status: "Analizado con éxito",
-        analysis,
+        ok: true,
+        message: "Cloudflare encontró las credenciales de GitHub correctamente.",
+        appId: appId
       }),
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       }
     );
-  } catch (err) {
+  } catch (error) {
     return new Response(
       JSON.stringify({
-        status: "Error interno",
-        error: err.message,
+        ok: false,
+        error: error.message
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       }
     );
   }
