@@ -31,7 +31,7 @@ Por favor responde en Español de forma muy concisa:
             headers: { "Content-Type": "application/json" }
         });
 
-    } (err) {
+    } catch (err) {
         return new Response(JSON.stringify({ error: err.message, status: 500 }), {
             headers: { "Content-Type": "application/json" }
         });
