@@ -1,3 +1,19 @@
+export async function onRequestGet() {
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      message: "ai-fix-test funcionando",
+      next: "La función está lista para recibir errores mediante POST"
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+  );
+}
+
 export async function onRequestPost(context) {
   try {
     const body = await context.request.json();
@@ -43,6 +59,7 @@ ${lastFrame?.colno || "No disponible"}
 Tu tarea es determinar si existe una corrección simple y segura.
 
 IMPORTANTE:
+
 - No inventes archivos.
 - No inventes código que no puedas justificar.
 - Si no hay suficiente información para realizar una corrección segura, shouldFix debe ser false.
