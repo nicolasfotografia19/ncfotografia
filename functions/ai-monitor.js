@@ -3,7 +3,6 @@ export async function onRequestPost(context) {
         const sentryPayload = await context.request.json();
         const errorDetails = sentryPayload.event || {};
         
-        // Extracción robusta del mensaje de error
         const errorMessage = errorDetails.message || errorDetails.exception?.values?.[0]?.value || "Error desconocido";
         const errorStack = errorDetails.exception?.values?.[0]?.stacktrace?.frames?.slice(-3) || [];
 
@@ -18,7 +17,7 @@ Por favor responde en Español de forma muy concisa:
 
         const apiKey = context.env.GEMINI_API_KEY || context.env.LLM_API_KEY;
         if (!apiKey) {
-            return new Response(JSON.stringify({ status: "Error de configuración", message: "La API Key de Gemini no está definida en las variables de entorno." }), {
+            return new Response(JSON.stringify({ status: "Error de configuración", message: "La API Key no está definida en las variables de entorno." }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
