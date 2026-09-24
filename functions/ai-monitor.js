@@ -88,8 +88,17 @@ SOLUCIÓN:
     }
 
     const analysis =
-      aiData.output_text ||
-      "Gemini no devolvió ningún análisis.";
+  aiData.output_text ||
+  aiData.outputs
+    ?.filter(output => output.type === "text")
+    ?.map(output => output.text)
+    ?.join("\n") ||
+  aiData.steps
+    ?.flatMap(step => step.content || [])
+    ?.filter(content => content.type === "text")
+    ?.map(content => content.text)
+    ?.join("\n") ||
+  JSON.stringify(aiData);
 
     return new Response(
       JSON.stringify({
