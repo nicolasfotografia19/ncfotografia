@@ -99,13 +99,19 @@ export async function onRequestGet(context) {
       );
     }
 
+    // =====================================================
     // 1. Crear JWT
+    // =====================================================
+
     const jwt = await createGitHubJWT(
       appId,
       privateKey
     );
 
+    // =====================================================
     // 2. Buscar instalación
+    // =====================================================
+
     const installationsResponse = await fetch(
       "https://api.github.com/app/installations",
       {
@@ -164,7 +170,10 @@ export async function onRequestGet(context) {
 
     const installationId = installation.id;
 
+    // =====================================================
     // 3. Crear token de instalación
+    // =====================================================
+
     const tokenResponse = await fetch(
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
       {
@@ -187,7 +196,8 @@ export async function onRequestGet(context) {
           ok: false,
           step: "installation_token",
           githubStatus: tokenResponse.status,
-          error: tokenData
+          error: tokenData,
+          installationId
         }),
         {
           status: tokenResponse.status,
@@ -208,12 +218,18 @@ export async function onRequestGet(context) {
       "User-Agent": "NC-Fotografia-AI-Resolver"
     };
 
+    const repo =
+      "nicolasfotografia19/ncfotografia";
+
+    const branch =
+      "ai-test";
+
     // =====================================================
-    // 4. Obtener SHA de la rama ai-test
+    // 4. Comprobar que ai-test existe
     // =====================================================
 
     const branchResponse = await fetch(
-      "https://api.github.com/repos/nicolasfotografia19/ncfotografia/git/ref/heads/ai-test",
+      `https://api.github.com/repos/${repo}/git/ref/heads/${branch}`,
       {
         headers: githubHeaders
       }
@@ -240,37 +256,61 @@ export async function onRequestGet(context) {
     }
 
     // =====================================================
-    // 5. Crear archivo de prueba
+    // 5. Crear archivo de prueba / commit
     // =====================================================
 
-    const testContent = `NC Fotografia AI Resolver
+    const testContent = `# NC Fotografia AI Resolver
 
-Este archivo fue creado automáticamente por la GitHub App.
+Este archivo fue creado automáticamente.
 
-Objetivo:
-Probar creación de commits y Pull Requests.
+Esta es una prueba controlada de:
 
-Esta es solamente una prueba.
+- GitHub App
+- creación de commits
+- Pull Requests
+
+No es una corrección real del sitio.
 `;
 
-    // Convertir contenido a Base64
     const encodedContent =
       btoa(unescape(encodeURIComponent(testContent)));
 
+    // Primero comprobar si el archivo ya existe
+    const existingFileResponse = await fetch(
+      `https://api.github.com/repos/${repo}/contents/AI-TEST.md?ref=${branch}`,
+      {
+        headers: githubHeaders
+      }
+    );
+
+    let existingFile = null;
+
+    if (existingFileResponse.ok) {
+      existingFile =
+        await existingFileResponse.json();
+    }
+
+    const fileBody = {
+      message:
+        "test: prueba del NC Fotografia AI Resolver",
+      content: encodedContent,
+      branch
+    };
+
+    // Si el archivo ya existe, GitHub exige su SHA
+    if (existingFile?.sha) {
+      fileBody.sha = existingFile.sha;
+    }
+
     const fileResponse = await fetch(
-      "https://api.github.com/repos/nicolasfotografia19/ncfotografia/contents/AI-TEST.md",
+      `https://api.github.com/repos/${repo}/contents/AI-TEST.md`,
       {
         method: "PUT",
         headers: {
           ...githubHeaders,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          message:
-            "test: prueba del NC Fotografia AI Resolver",
-          content: encodedContent,
-          branch: "ai-test"
-        })
+        body: JSON.stringify(fileBody)
       }
     );
 
@@ -295,11 +335,86 @@ Esta es solamente una prueba.
     }
 
     // =====================================================
-    // 6. Crear Pull Request
+    // 6. Buscar si ya existe un PR
+    // =====================================================
+
+    const pullsResponse = await fetch(
+      `https://api.github.com/repos/${repo}/pulls?state=open&head=nicolasfotografia19:${branch}&base=main`,
+      {
+        headers: githubHeaders
+      }
+    );
+
+    const pullsData =
+      await pullsResponse.json();
+
+    if (!pullsResponse.ok) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          step: "find_pull_request",
+          githubStatus: pullsResponse.status,
+          error: pullsData
+        }),
+        {
+          status: pullsResponse.status,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    // =====================================================
+    // 7. Si ya existe PR, devolverlo
+    // =====================================================
+
+    if (pullsData.length > 0) {
+      const existingPR = pullsData[0];
+
+      return new Response(
+        JSON.stringify(
+          {
+            ok: true,
+            message:
+              "Commit creado. Ya existe un Pull Request para esta rama.",
+
+            branch,
+
+            commit:
+              fileData.commit?.sha || null,
+
+            pullRequest: {
+              number:
+                existingPR.number,
+              title:
+                existingPR.title,
+              url:
+                existingPR.html_url
+            },
+
+            repository: repo,
+
+            installationId
+          },
+          null,
+          2
+        ),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    // =====================================================
+    // 8. Crear Pull Request
     // =====================================================
 
     const pullRequestResponse = await fetch(
-      "https://api.github.com/repos/nicolasfotografia19/ncfotografia/pulls",
+      `https://api.github.com/repos/${repo}/pulls`,
       {
         method: "POST",
         headers: {
@@ -309,10 +424,15 @@ Esta es solamente una prueba.
         body: JSON.stringify({
           title:
             "test: NC Fotografia AI Resolver",
-          head: "ai-test",
-          base: "main",
+
+          head:
+            branch,
+
+          base:
+            "main",
+
           body:
-            "## Prueba del AI Resolver\n\n" +
+            "## Prueba del NC Fotografia AI Resolver\n\n" +
             "Este Pull Request fue creado automáticamente para comprobar que la GitHub App puede:\n\n" +
             "- Crear una rama\n" +
             "- Crear un commit\n" +
@@ -344,7 +464,7 @@ Esta es solamente una prueba.
     }
 
     // =====================================================
-    // 7. ÉXITO
+    // 9. ÉXITO
     // =====================================================
 
     return new Response(
@@ -355,7 +475,7 @@ Esta es solamente una prueba.
           message:
             "¡GitHub App puede crear commits y Pull Requests!",
 
-          branch: "ai-test",
+          branch,
 
           commit:
             fileData.commit?.sha || null,
@@ -369,8 +489,7 @@ Esta es solamente una prueba.
               pullRequestData.html_url
           },
 
-          repository:
-            "nicolasfotografia19/ncfotografia",
+          repository: repo,
 
           installationId
         },
