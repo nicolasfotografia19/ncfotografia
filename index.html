@@ -55,8 +55,8 @@
       <h1 class="text-4xl md:text-5xl font-serif text-white mb-4 leading-tight font-light">Arquitectura, retratos y <span class="italic">atmósferas visuales.</span></h1>
       <p class="text-sm text-zinc-400 font-light max-w-2xl leading-relaxed">Una colección fotográfica pura basada en la luz natural, los contrastes honestos y la estética documental.</p>
       
-      <!-- Filtros de script1.js -->
-      <div class="mt-8 flex flex-wrap gap-3">
+      <!-- Filtros actualizados -->
+      <div class="mt-8 flex flex-wrap gap-3" id="filter-buttons">
         <button onclick="filterPosts('Todas')" data-category="Todas" class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium transition-all text-white border-b border-white">Todas</button>
         <button onclick="filterPosts('Arquitectura')" data-category="Arquitectura" class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium transition-all text-white/40 hover:text-white">Arquitectura</button>
         <button onclick="filterPosts('Retratos')" data-category="Retratos" class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium transition-all text-white/40 hover:text-white">Retratos</button>
@@ -84,7 +84,109 @@
   </div>
 
   <script src="/fetch-menu.js"></script>
-  <script src="/script1.js"></script>
+
+  <!-- Lógica integrada de tu propia API de Instagram -->
+  <script>
+    const IG_API_URL = 'https://script.google.com/macros/s/AKfycbxyQ5A2KD8Y8r5fNyX379ZjMuSseoUbQGfEIeG0arJ-ff5ipfV2f_yCnw7TrF2dlPndzw/exec';
+    let allPosts = [];
+
+    async function loadGallery() {
+      const loading = document.getElementById('loading-indicator');
+      const container = document.getElementById('gallery-container');
+      const errorBox = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+
+      try {
+        const response = await fetch(IG_API_URL);
+        if (!response.ok) throw new Error('Error al conectar con el servidor.');
+        
+        allPosts = await response.json();
+        if (allPosts.error) throw new Error(allPosts.error);
+
+        loading.style.display = 'none';
+        renderPosts(allPosts);
+      } catch (err) {
+        loading.style.display = 'none';
+        errorText.textContent = 'No se pudo sincronizar el feed: ' + err.message;
+        errorBox.classList.remove('hidden');
+      }
+    }
+
+    function renderPosts(posts) {
+      const container = document.getElementById('gallery-container');
+      container.innerHTML = '';
+
+      if (posts.length === 0) {
+        container.innerHTML = '<div class="col-span-full text-center text-xs text-zinc-500 font-mono">No hay publicaciones disponibles.</div>';
+        return;
+      }
+
+      posts.forEach((post, index) => {
+        const imgUrl = post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url;
+        const caption = post.caption || '';
+        
+        const item = document.createElement('div');
+        item.className = 'masonry-item relative group cursor-pointer overflow-hidden bg-[#08080a] border border-white/[0.08] rounded-sm';
+        item.onclick = () => openLightbox(post);
+
+        item.innerHTML = `
+          <img src="${imgUrl}" alt="${caption.substring(0, 30)}" class="w-full h-auto object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" loading="lazy">
+          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[2px]">
+            <span class="text-[9px] uppercase tracking-[0.25em] text-white font-mono font-medium">Ampliar</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // Sistema de filtrado básico por palabras clave en el texto (caption) de Instagram
+    function filterPosts(category) {
+      // Actualizar estilos visuales de los botones
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.dataset.category === category) {
+          btn.className = 'filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium transition-all text-white border-b border-white';
+        } else {
+          btn.className = 'filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium transition-all text-white/40 hover:text-white';
+        }
+      });
+
+      if (category === 'Todas') {
+        renderPosts(allPosts);
+        return;
+      }
+
+      const filtered = allPosts.filter(post => {
+        const text = (post.caption || '').toLowerCase();
+        return text.includes(category.toLowerCase());
+      });
+
+      renderPosts(filtered);
+    }
+
+    function openLightbox(post) {
+      const lightbox = document.getElementById('lightbox');
+      const mediaContainer = document.getElementById('lightbox-media-container');
+      const captionEl = document.getElementById('lightbox-caption');
+      const linkEl = document.getElementById('lightbox-link');
+      
+      const imgUrl = post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url;
+
+      mediaContainer.innerHTML = `<img src="${imgUrl}" class="max-h-[75vh] w-auto object-contain rounded-sm" />`;
+      captionEl.textContent = post.caption || 'Sin descripción';
+      linkEl.href = post.permalink;
+
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      lightbox.classList.remove('flex');
+      lightbox.classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadGallery);
+  </script>
 
   <!-- Bloqueo de clic derecho -->
   <script>
