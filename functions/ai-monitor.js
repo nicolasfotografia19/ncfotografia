@@ -16,7 +16,7 @@ Por favor responde en Español de forma muy concisa:
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
         // Coloca tu clave directamente aquí entre las comillas para evitar problemas de lectura en Cloudflare
-        const apiKey = "AQ.Ab8RN6KpNj_gBBg35DdqsYXSy_pMH7wl-Ch0oW3bNpBmZL_A8Q";
+        const apiKey = context.env.GEMINI_API_KEY;
 
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
