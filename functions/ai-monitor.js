@@ -24,32 +24,12 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        let url;
-        let headers = { 'Content-Type': 'application/json' };
-        let bodyData;
-
-        // Configuramos la ruta dependiendo de si es una clave de AI Studio o un token de Google Cloud (AQ.)
-        if (apiKey.startsWith('AIza')) {
-            url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
-            bodyData = { contents: [{ parts: [{ text: prompt }] }] };
-        } else {
-            // Endpoint de Vertex AI para credenciales AQ. (usando el ID de tu proyecto detectado)
-            const projectId = "1035527175948";
-            url = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/gemini-1.5-flash:generateContent`;
-            headers['Authorization'] = `Bearer ${apiKey}`;
-            // Vertex AI utiliza una estructura de contenido ligeramente distinta (contents -> role/parts)
-            bodyData = {
-                contents: [{
-                    role: "user",
-                    parts: [{ text: prompt }]
-                }]
-            };
-        }
-
-        const geminiResponse = await fetch(url, {
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
-            headers: headers,
-            body: JSON.stringify(bodyData)
+            headers: { 'Content-Type": "application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
         });
 
         const aiData = await geminiResponse.json();
