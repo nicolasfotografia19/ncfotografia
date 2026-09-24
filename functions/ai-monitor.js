@@ -6,14 +6,14 @@ export async function onRequestPost(context) {
         const errorMessage = errorDetails.message || errorDetails.exception?.values?.[0]?.value || "Error desconocido";
         const errorStack = errorDetails.exception?.values?.[0]?.stacktrace?.frames?.slice(-3) || [];
 
-        // Verificamos de dónde puede venir la clave
-        const apiKey = context.env.GEMINI_API_KEY || context.env.API_KEY;
+        // Evaluamos las distintas formas en que Cloudflare puede exponer la variable de entorno
+        const apiKey = context.env.GEMINI_API_KEY || (typeof GEMINI_API_KEY !== 'undefined' ? GEMINI_API_KEY : null);
 
         if (!apiKey) {
             return new Response(JSON.stringify({ 
                 status: "Error de configuración", 
-                message: "La clave no está llegando a context.env",
-                envKeys: Object.keys(context.env || {}) 
+                message: "La variable GEMINI_API_KEY no está accesible en el entorno de ejecución",
+                availableEnv: Object.keys(context.env || {})
             }), {
                 headers: { "Content-Type": "application/json" }
             });
