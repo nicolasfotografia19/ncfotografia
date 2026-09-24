@@ -24,7 +24,7 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
