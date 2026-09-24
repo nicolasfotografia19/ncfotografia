@@ -7,8 +7,15 @@
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
   <title>Nicolás Fotografía — Portafolio</title>
 
-  <!-- Sentry SDK Oficial con DSN integrado -->
-  <script src="https://js.sentry-cdn.com/77ca64b8b1ef19ae6322d6c94a717.min.js" crossorigin="anonymous"></script>
+  <!-- Sentry SDK Bundle Oficial Estable -->
+  <script src="https://browser.sentry-cdn.com/7.100.0/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    Sentry.init({
+      dsn: "https://77ca64b8b1ef19ae6322d6c94a717@ncfotografia.sentry.io/ncfotografia-web",
+      environment: "production",
+      tracesSampleRate: 1.0,
+    });
+  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
