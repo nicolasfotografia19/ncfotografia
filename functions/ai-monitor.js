@@ -105,7 +105,7 @@ export async function onRequestGet(context) {
       privateKey
     );
 
-    // 2. Obtener las instalaciones actuales
+    // 2. Buscar la instalación actual
     const installationsResponse = await fetch(
       "https://api.github.com/app/installations",
       {
@@ -138,7 +138,6 @@ export async function onRequestGet(context) {
       );
     }
 
-    // 3. Buscar la instalación de Nicolas
     const installation =
       installationsData.find(
         (item) =>
@@ -150,16 +149,8 @@ export async function onRequestGet(context) {
       return new Response(
         JSON.stringify({
           ok: false,
-          message:
-            "No se encontró una instalación de la GitHub App para nicolasfotografia19.",
-          installations:
-            installationsData.map((item) => ({
-              id: item.id,
-              account: item.account?.login,
-              repositorySelection:
-                item.repository_selection,
-              permissions: item.permissions
-            }))
+          error:
+            "No se encontró la instalación de la GitHub App."
         }),
         {
           status: 404,
@@ -172,41 +163,7 @@ export async function onRequestGet(context) {
 
     const installationId = installation.id;
 
-    // 4. Obtener información REAL de la instalación
-    const installationResponse = await fetch(
-      `https://api.github.com/app/installations/${installationId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          Accept: "application/vnd.github+json",
-          "X-GitHub-Api-Version": "2022-11-28",
-          "User-Agent": "NC-Fotografia-AI-Resolver"
-        }
-      }
-    );
-
-    const installationData =
-      await installationResponse.json();
-
-    if (!installationResponse.ok) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          step: "get_installation",
-          githubStatus: installationResponse.status,
-          error: installationData,
-          installationId
-        }),
-        {
-          status: installationResponse.status,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    }
-
-    // 5. Crear token de instalación
+    // 3. Crear token de instalación
     const tokenResponse = await fetch(
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
       {
@@ -244,33 +201,34 @@ export async function onRequestGet(context) {
     const installationToken =
       tokenData.token;
 
-    // 6. Consultar repositorios disponibles
-    const repositoriesResponse = await fetch(
-      "https://api.github.com/installation/repositories",
+    const githubHeaders = {
+      Authorization: `Bearer ${installationToken}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "NC-Fotografia-AI-Resolver"
+    };
+
+    // 4. Obtener información de main
+    const branchResponse = await fetch(
+      "https://api.github.com/repos/nicolasfotografia19/ncfotografia/git/ref/heads/main",
       {
-        headers: {
-          Authorization: `Bearer ${installationToken}`,
-          Accept: "application/vnd.github+json",
-          "X-GitHub-Api-Version": "2022-11-28",
-          "User-Agent": "NC-Fotografia-AI-Resolver"
-        }
+        headers: githubHeaders
       }
     );
 
-    const repositoriesData =
-      await repositoriesResponse.json();
+    const branchData =
+      await branchResponse.json();
 
-    if (!repositoriesResponse.ok) {
+    if (!branchResponse.ok) {
       return new Response(
         JSON.stringify({
           ok: false,
-          step: "installation_repositories",
-          githubStatus: repositoriesResponse.status,
-          error: repositoriesData,
-          installationId
+          step: "get_main_ref",
+          githubStatus: branchResponse.status,
+          error: branchData
         }),
         {
-          status: repositoriesResponse.status,
+          status: branchResponse.status,
           headers: {
             "Content-Type": "application/json"
           }
@@ -278,28 +236,40 @@ export async function onRequestGet(context) {
       );
     }
 
-    // 7. Buscar nuestro repositorio
-    const repository =
-      repositoriesData.repositories?.find(
-        (repo) =>
-          repo.full_name ===
-          "nicolasfotografia19/ncfotografia"
-      );
+    const mainSha = branchData.object.sha;
 
-    if (!repository) {
+    // 5. Crear rama de prueba
+    const createBranchResponse = await fetch(
+      "https://api.github.com/repos/nicolasfotografia19/ncfotografia/git/refs",
+      {
+        method: "POST",
+        headers: {
+          ...githubHeaders,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ref: "refs/heads/ai-test",
+          sha: mainSha
+        })
+      }
+    );
+
+    const createBranchData =
+      await createBranchResponse.json();
+
+    // 6. Resultado
+    if (!createBranchResponse.ok) {
       return new Response(
         JSON.stringify({
           ok: false,
-          message:
-            "La GitHub App está instalada, pero no encuentra el repositorio ncfotografia.",
+          step: "create_branch",
+          githubStatus: createBranchResponse.status,
+          error: createBranchData,
           installationId,
-          repositories:
-            repositoriesData.repositories?.map(
-              (repo) => repo.full_name
-            )
+          mainSha
         }),
         {
-          status: 403,
+          status: createBranchResponse.status,
           headers: {
             "Content-Type": "application/json"
           }
@@ -307,42 +277,19 @@ export async function onRequestGet(context) {
       );
     }
 
-    // 8. Devolver diagnóstico
     return new Response(
       JSON.stringify(
         {
           ok: true,
-
           message:
-            "Diagnóstico de GitHub App completado.",
-
-          appId: appId,
-
-          installationId: installationId,
-
-          account:
-            installationData.account?.login,
-
-          repositorySelection:
-            installationData.repository_selection,
-
-          installationPermissions:
-            installationData.permissions,
-
+            "¡La GitHub App puede escribir en el repositorio!",
+          test: "create_branch",
+          branch: "ai-test",
+          baseBranch: "main",
+          sha: mainSha,
           repository:
-            repository.full_name,
-
-          private:
-            repository.private,
-
-          defaultBranch:
-            repository.default_branch,
-
-          repositoryPermissions:
-            repository.permissions,
-
-          updatedAt:
-            installationData.updated_at
+            "nicolasfotografia19/ncfotografia",
+          installationId
         },
         null,
         2
@@ -359,6 +306,7 @@ export async function onRequestGet(context) {
     return new Response(
       JSON.stringify({
         ok: false,
+        step: "unexpected_error",
         error: error.message
       }),
       {
