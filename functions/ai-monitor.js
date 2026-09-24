@@ -15,8 +15,12 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        // Coloca tu clave directamente aquí entre las comillas para evitar problemas de lectura en Cloudflare
         const apiKey = context.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return new Response(JSON.stringify({ status: "Error de configuración", message: "La variable GEMINI_API_KEY no está definida en Cloudflare." }), {
+                headers: { "Content-Type": "application/json" }
+            });
+        }
 
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
@@ -28,8 +32,8 @@ Por favor responde en Español de forma muy concisa:
 
         const aiData = await geminiResponse.json();
 
-        if (!aiData.candidates || aiData.error) {
-            return new Response(JSON.stringify({ status: "Error de la API de Google", details: aiData }), {
+        if (!geminiResponse.ok || !aiData.candidates) {
+            return new Response(JSON.stringify({ status: "Error de la API de Google", httpStatus: geminiResponse.status, details: aiData }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
