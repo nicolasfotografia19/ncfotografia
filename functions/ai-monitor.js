@@ -13,7 +13,9 @@ function base64UrlEncode(data) {
 }
 
 function stringToBase64Url(str) {
-  return base64UrlEncode(new TextEncoder().encode(str));
+  return base64UrlEncode(
+    new TextEncoder().encode(str)
+  );
 }
 
 function pemToArrayBuffer(pem) {
@@ -97,12 +99,13 @@ export async function onRequestGet(context) {
       );
     }
 
+    // 1. Crear JWT de la GitHub App
     const jwt = await createGitHubJWT(
       appId,
       privateKey
     );
 
-    // Convertir JWT de App en token de instalación
+    // 2. Obtener token de instalación
     const tokenResponse = await fetch(
       "https://api.github.com/app/installations/164618009/access_tokens",
       {
@@ -137,9 +140,10 @@ export async function onRequestGet(context) {
 
     const installationToken = tokenData.token;
 
-    // Consultar el repositorio
-    const repoResponse = await fetch(
-      "https://api.github.com/repos/nicolasfotografia19/ncfotografia",
+    // 3. Consultar los repositorios disponibles
+    // para esta instalación
+    const repositoriesResponse = await fetch(
+      "https://api.github.com/installation/repositories",
       {
         headers: {
           Authorization: `Bearer ${installationToken}`,
@@ -150,18 +154,19 @@ export async function onRequestGet(context) {
       }
     );
 
-    const repoData = await repoResponse.json();
+    const repositoriesData =
+      await repositoriesResponse.json();
 
-    if (!repoResponse.ok) {
+    if (!repositoriesResponse.ok) {
       return new Response(
         JSON.stringify({
           ok: false,
-          step: "repository_access",
-          githubStatus: repoResponse.status,
-          error: repoData
+          step: "installation_repositories",
+          githubStatus: repositoriesResponse.status,
+          error: repositoriesData
         }),
         {
-          status: repoResponse.status,
+          status: repositoriesResponse.status,
           headers: {
             "Content-Type": "application/json"
           }
@@ -169,17 +174,45 @@ export async function onRequestGet(context) {
       );
     }
 
+    // Buscar nuestro repositorio
+    const repository =
+      repositoriesData.repositories?.find(
+        (repo) =>
+          repo.full_name ===
+          "nicolasfotografia19/ncfotografia"
+      );
+
+    if (!repository) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          message:
+            "La GitHub App está instalada, pero no encuentra el repositorio ncfotografia.",
+          repositories:
+            repositoriesData.repositories?.map(
+              (repo) => repo.full_name
+            )
+        }),
+        {
+          status: 403,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    // 4. Devolver únicamente información segura
     return new Response(
       JSON.stringify({
         ok: true,
-        message: "GitHub puede acceder al repositorio correctamente.",
-        repository: repoData.full_name,
-        private: repoData.private,
-        defaultBranch: repoData.default_branch,
-        permissions: {
-          contents: repoData.permissions?.push,
-          pullRequests: repoData.permissions?.admin
-        }
+        message:
+          "GitHub App conectada correctamente al repositorio.",
+        repository: repository.full_name,
+        private: repository.private,
+        defaultBranch: repository.default_branch,
+        permissions: repository.permissions,
+        installationId: 164618009
       }),
       {
         status: 200,
