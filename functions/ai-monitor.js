@@ -24,7 +24,8 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // Usamos el nombre exacto del modelo actual y la versión v1beta
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -34,8 +35,13 @@ Por favor responde en Español de forma muy concisa:
 
         const aiData = await geminiResponse.json();
 
-        if (!geminiResponse.ok || !aiData.candidates) {
-            return new Response(JSON.stringify({ status: "Error de la API de Google", httpStatus: geminiResponse.status, details: aiData }), {
+        // Si falla, devolvemos textualmente el error completo que arroja Google para inspeccionarlo
+        if (!geminiResponse.ok) {
+            return new Response(JSON.stringify({ 
+                status: "Google API Error Detail", 
+                httpStatus: geminiResponse.status, 
+                googleError: aiData 
+            }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
