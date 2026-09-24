@@ -15,9 +15,9 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        const apiKey = context.env.GEMINI_API_KEY || context.env.LLM_API_KEY;
+        const apiKey = context.env.GEMINI_API_KEY;
         if (!apiKey) {
-            return new Response(JSON.stringify({ status: "Error de configuración", message: "La API Key no está definida en las variables de entorno." }), {
+            return new Response(JSON.stringify({ status: "Error de configuración", message: "La variable GEMINI_API_KEY no está definida en Cloudflare." }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
