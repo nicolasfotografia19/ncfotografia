@@ -15,7 +15,14 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${context.env.GEMINI_API_KEY}`, {
+        const apiKey = context.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return new Response(JSON.stringify({ status: "Error", message: "La API Key de Gemini no está definida en las variables de entorno." }), {
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -25,9 +32,8 @@ Por favor responde en Español de forma muy concisa:
 
         const aiData = await geminiResponse.json();
 
-        // Si Google devuelve un error, lo mostramos tal cual en la consola
-        if (!aiData.candidates) {
-            return new Response(JSON.stringify({ status: "Error devuelto por Google", raw: aiData }), {
+        if (!aiData.candidates || aiData.error) {
+            return new Response(JSON.stringify({ status: "Error de la API de Google", details: aiData }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
