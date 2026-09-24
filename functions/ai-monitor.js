@@ -46,8 +46,13 @@ async function createGitHubJWT(appId, privateKeyPem) {
     iss: appId
   };
 
-  const encodedHeader = stringToBase64Url(JSON.stringify(header));
-  const encodedPayload = stringToBase64Url(JSON.stringify(payload));
+  const encodedHeader = stringToBase64Url(
+    JSON.stringify(header)
+  );
+
+  const encodedPayload = stringToBase64Url(
+    JSON.stringify(payload)
+  );
 
   const unsignedToken =
     `${encodedHeader}.${encodedPayload}`;
@@ -92,16 +97,16 @@ export async function onRequestGet(context) {
       );
     }
 
-    // Crear JWT de la GitHub App
     const jwt = await createGitHubJWT(
       appId,
       privateKey
     );
 
-    // Consultar las instalaciones de la App
-    const response = await fetch(
-      "https://api.github.com/app/installations",
+    // Convertir JWT de App en token de instalación
+    const tokenResponse = await fetch(
+      "https://api.github.com/app/installations/164618009/access_tokens",
       {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${jwt}`,
           Accept: "application/vnd.github+json",
@@ -111,17 +116,52 @@ export async function onRequestGet(context) {
       }
     );
 
-    const data = await response.json();
+    const tokenData = await tokenResponse.json();
 
-    if (!response.ok) {
+    if (!tokenResponse.ok) {
       return new Response(
         JSON.stringify({
           ok: false,
-          githubStatus: response.status,
-          error: data
+          step: "installation_token",
+          githubStatus: tokenResponse.status,
+          error: tokenData
         }),
         {
-          status: response.status,
+          status: tokenResponse.status,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    const installationToken = tokenData.token;
+
+    // Consultar el repositorio
+    const repoResponse = await fetch(
+      "https://api.github.com/repos/nicolasfotografia19/ncfotografia",
+      {
+        headers: {
+          Authorization: `Bearer ${installationToken}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "User-Agent": "NC-Fotografia-AI-Resolver"
+        }
+      }
+    );
+
+    const repoData = await repoResponse.json();
+
+    if (!repoResponse.ok) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          step: "repository_access",
+          githubStatus: repoResponse.status,
+          error: repoData
+        }),
+        {
+          status: repoResponse.status,
           headers: {
             "Content-Type": "application/json"
           }
@@ -132,12 +172,14 @@ export async function onRequestGet(context) {
     return new Response(
       JSON.stringify({
         ok: true,
-        message: "GitHub App autenticada correctamente.",
-        installations: data.map((installation) => ({
-          id: installation.id,
-          account: installation.account?.login,
-          repositorySelection: installation.repository_selection
-        }))
+        message: "GitHub puede acceder al repositorio correctamente.",
+        repository: repoData.full_name,
+        private: repoData.private,
+        defaultBranch: repoData.default_branch,
+        permissions: {
+          contents: repoData.permissions?.push,
+          pullRequests: repoData.permissions?.admin
+        }
       }),
       {
         status: 200,
