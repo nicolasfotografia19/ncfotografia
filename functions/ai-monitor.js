@@ -3,7 +3,6 @@ export async function onRequestPost(context) {
         const sentryPayload = await context.request.json();
         const errorDetails = sentryPayload.event || {};
         
-        // Extracción robusta del mensaje de error
         const errorMessage = errorDetails.message || errorDetails.exception?.values?.[0]?.value || "Error desconocido";
         const errorStack = errorDetails.exception?.values?.[0]?.stacktrace?.frames?.slice(-3) || [];
 
@@ -25,7 +24,15 @@ Por favor responde en Español de forma muy concisa:
         });
 
         const aiData = await geminiResponse.json();
-        const analysis = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo analizar.";
+
+        // Si Google devuelve un error, lo mostramos tal cual en la consola
+        if (!aiData.candidates) {
+            return new Response(JSON.stringify({ status: "Error devuelto por Google", raw: aiData }), {
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        const analysis = aiData.candidates[0].content.parts[0].text;
 
         return new Response(JSON.stringify({ status: "Analizado con éxito", analysis }), {
             headers: { "Content-Type": "application/json" }
