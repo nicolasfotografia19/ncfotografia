@@ -15,12 +15,8 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        const apiKey = context.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return new Response(JSON.stringify({ status: "Error de configuración", message: "La variable GEMINI_API_KEY no está definida en Cloudflare." }), {
-                headers: { "Content-Type": "application/json" }
-            });
-        }
+        // Usamos la clave directamente aquí para evitar problemas de variables de entorno
+        const apiKey = "AQ.Ab8RN6JaTKyeDj1iK906xdWk6GLh1mC292U65xpKSBktwfELzwL";
 
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
