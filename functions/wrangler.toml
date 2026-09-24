@@ -1,0 +1,5 @@
+name = "ncfotografia"
+compatibility_date = "2026-09-24"
+
+[vars]
+GEMINI_API_KEY = "PEGA_AQUI_TU_CLAVE_DE_AI_STUDIO"
