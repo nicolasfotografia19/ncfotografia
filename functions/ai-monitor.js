@@ -19,13 +19,13 @@ export async function onRequestPost(context) {
 Mensaje: "${errorMessage}"
 Stack: ${JSON.stringify(errorStack)}
 
-Por favor responde en Español de forma muy concisa:
+Por favor responde in Español de forma muy concisa:
 1. Explica la causa raíz del error en una línea.
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        // Apuntamos al modelo gemini-pro que es completamente compatible con v1beta
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+        // Endpoint v1 estable con el modelo gemini-1.5-flash
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
