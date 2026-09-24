@@ -22,6 +22,7 @@ Por favor responde en Español de forma muy concisa:
             });
         }
 
+        // Actualizamos la URL con el modelo estable correcto
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
