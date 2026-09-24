@@ -6,17 +6,13 @@ export async function onRequestPost(context) {
         const errorMessage = errorDetails.message || errorDetails.exception?.values?.[0]?.value || "Error desconocido";
         const errorStack = errorDetails.exception?.values?.[0]?.stacktrace?.frames?.slice(-3) || [];
 
-        // Evaluamos las distintas formas en que Cloudflare puede exponer la variable de entorno
         const apiKey = context.env.GEMINI_API_KEY || (typeof GEMINI_API_KEY !== 'undefined' ? GEMINI_API_KEY : null);
 
         if (!apiKey) {
             return new Response(JSON.stringify({ 
                 status: "Error de configuración", 
-                message: "La variable GEMINI_API_KEY no está accesible en el entorno de ejecución",
-                availableEnv: Object.keys(context.env || {})
-            }), {
-                headers: { "Content-Type": "application/json" }
-            });
+                message: "La variable GEMINI_API_KEY no está accesible" 
+            }), { headers: { "Content-Type": "application/json" } });
         }
 
         const prompt = `Actúa como un desarrollador frontend experto. Ocurrió un error en mi sitio web de fotografía:
@@ -28,10 +24,19 @@ Por favor responde en Español de forma muy concisa:
 2. Determina si es "simple" de corregir (true/false).
 3. Si es simple, provee el fragmento exacto de código corregido.`;
 
-        // URL actualizada a v1 y gemini-pro para evitar el error 404
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`, {
+        // Preparamos la URL y los headers según el tipo de clave (AQ o AIza)
+        let url = "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent";
+        const headers = { 'Content-Type': 'application/json' };
+
+        if (apiKey.startsWith('AIza')) {
+            url += `?key=${apiKey}`;
+        } else {
+            headers['Authorization'] = `Bearer ${apiKey}`;
+        }
+
+        const geminiResponse = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }]
             })
