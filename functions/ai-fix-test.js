@@ -3,6 +3,15 @@ const GITHUB_REPO = "ncfotografia";
 const GITHUB_BRANCH = "main";
 const GITHUB_INSTALLATION_ID = "164623831";
 
+const TEST_FILE = "script0.js";
+
+const GEMINI_MODELS = [
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.6-flash",
+  "gemini-3.5-flash"
+];
+
 function base64UrlEncode(data) {
   const bytes = new Uint8Array(data);
   let binary = "";
@@ -103,14 +112,12 @@ async function createInstallationToken(env) {
     );
   }
 
-  const data = JSON.parse(text);
-
-  return data.token;
+  return JSON.parse(text).token;
 }
 
-async function listGitHubContents(token) {
+async function getGitHubFile(token, filePath) {
   const url =
-    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/?ref=${GITHUB_BRANCH}`;
+    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}?ref=${GITHUB_BRANCH}`;
 
   const response = await fetch(url, {
     headers: {
@@ -125,33 +132,194 @@ async function listGitHubContents(token) {
 
   if (!response.ok) {
     throw new Error(
-      `GitHub no pudo listar el repositorio: ${text}`
+      `GitHub no pudo leer ${filePath}: ${text}`
     );
   }
 
-  return JSON.parse(text);
-}
+  const data = JSON.parse(text);
 
-function renderFiles(items) {
-  if (!Array.isArray(items)) {
-    return "<p>No se recibieron archivos.</p>";
+  if (data.encoding !== "base64") {
+    throw new Error(
+      `GitHub devolvió un formato inesperado para ${filePath}`
+    );
   }
 
-  const files = items
-    .map(item => {
-      const icon = item.type === "dir" ? "📁" : "📄";
+  const binary = atob(data.content.replace(/\s/g, ""));
 
-      return `
-        <li>
-          ${icon}
-          <strong>${escapeHtml(item.path)}</strong>
-          <small> (${escapeHtml(item.type)})</small>
-        </li>
-      `;
-    })
-    .join("");
+  const bytes = Uint8Array.from(
+    binary,
+    char => char.charCodeAt(0)
+  );
 
-  return `<ul>${files}</ul>`;
+  const content = new TextDecoder().decode(bytes);
+
+  return {
+    path: data.path,
+    sha: data.sha,
+    content
+  };
+}
+
+async function askGemini(env, filePath, code) {
+  const prompt = `
+Actuás como un ingeniero senior de JavaScript encargado de analizar errores
+de una página web.
+
+Analizá exclusivamente el siguiente archivo:
+
+ARCHIVO:
+${filePath}
+
+CÓDIGO:
+--------------------
+${code}
+--------------------
+
+Buscá errores reales que puedan provocar fallos en producción.
+
+No inventes errores.
+
+Si no encontrás un problema claro, devolvé:
+
+{
+  "shouldFix": false,
+  "file": "${filePath}",
+  "explanation": "No se encontró un error claro que pueda corregirse automáticamente.",
+  "oldCode": "",
+  "newCode": ""
+}
+
+Si encontrás un error claro y seguro de corregir, devolvé:
+
+{
+  "shouldFix": true,
+  "file": "${filePath}",
+  "explanation": "Explicación breve del problema.",
+  "oldCode": "fragmento exacto del código original",
+  "newCode": "fragmento corregido"
+}
+
+REGLAS IMPORTANTES:
+
+1. No inventes funciones, variables ni archivos.
+2. oldCode debe existir exactamente dentro del código proporcionado.
+3. newCode debe ser una corrección concreta.
+4. No cambies código que no esté relacionado con el problema.
+5. Si no estás seguro, shouldFix debe ser false.
+6. Respondé exclusivamente JSON válido.
+`;
+
+  let lastError = null;
+
+  for (const model of GEMINI_MODELS) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0,
+              responseMimeType: "application/json"
+            }
+          })
+        }
+      );
+
+      const text = await response.text();
+
+      if (!response.ok) {
+        lastError = new Error(
+          `Gemini ${model}: ${text}`
+        );
+
+        if (
+          response.status === 429 ||
+          response.status === 500 ||
+          response.status === 502 ||
+          response.status === 503 ||
+          response.status === 504
+        ) {
+          continue;
+        }
+
+        throw lastError;
+      }
+
+      const data = JSON.parse(text);
+
+      const resultText =
+        data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!resultText) {
+        throw new Error(
+          `Gemini ${model} no devolvió contenido.`
+        );
+      }
+
+      const fix = JSON.parse(resultText);
+
+      if (typeof fix.shouldFix !== "boolean") {
+        throw new Error(
+          "Gemini devolvió un JSON sin shouldFix válido."
+        );
+      }
+
+      if (fix.file !== filePath) {
+        throw new Error(
+          `Gemini indicó otro archivo: ${fix.file}`
+        );
+      }
+
+      if (fix.shouldFix) {
+        if (!fix.oldCode || !code.includes(fix.oldCode)) {
+          throw new Error(
+            "Gemini propuso oldCode que no existe exactamente en el archivo."
+          );
+        }
+
+        if (!fix.newCode) {
+          throw new Error(
+            "Gemini indicó que hay que corregir pero newCode está vacío."
+          );
+        }
+      }
+
+      return {
+        model,
+        fix
+      };
+
+    } catch (error) {
+      lastError = error;
+
+      if (
+        error.message.includes("429") ||
+        error.message.includes("500") ||
+        error.message.includes("502") ||
+        error.message.includes("503") ||
+        error.message.includes("504")
+      ) {
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw lastError || new Error("No se pudo consultar Gemini.");
 }
 
 function escapeHtml(value) {
@@ -165,119 +333,156 @@ function escapeHtml(value) {
 
 export async function onRequest(context) {
   try {
+
+    // =========================
+    // PÁGINA DE PRUEBA
+    // =========================
+
     if (context.request.method === "GET") {
       return new Response(`
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-          <meta charset="UTF-8">
-          <title>NC Fotografía - GitHub Test</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              max-width: 900px;
-              margin: 40px auto;
-              padding: 20px;
-              line-height: 1.5;
-            }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>NC Fotografía AI Resolver</title>
 
-            button {
-              padding: 12px 20px;
-              font-size: 16px;
-              cursor: pointer;
-            }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.5;
+    }
 
-            #resultado {
-              margin-top: 25px;
-              padding: 20px;
-              background: #f5f5f5;
-              border-radius: 8px;
-              overflow-x: auto;
-            }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
 
-            ul {
-              padding-left: 25px;
-            }
+    pre {
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
 
-            li {
-              margin: 8px 0;
-            }
+    .ok {
+      color: green;
+    }
 
-            .ok {
-              color: green;
-            }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
 
-            .error {
-              color: red;
-            }
-          </style>
-        </head>
+<body>
 
-        <body>
-          <h1>NC Fotografía AI Resolver</h1>
+  <h1>🤖 NC Fotografía AI Resolver</h1>
 
-          <p>
-            Esta prueba solamente va a leer los archivos de
-            <strong>${GITHUB_OWNER}/${GITHUB_REPO}</strong>.
-          </p>
+  <p>
+    Esta prueba leerá:
+    <strong>${TEST_FILE}</strong>
+  </p>
 
-          <p>
-            No crea ramas, commits ni Pull Requests.
-          </p>
+  <p>
+    Luego enviará el código a Gemini para analizarlo.
+  </p>
 
-          <button onclick="probarGitHub()">
-            🔍 Buscar archivos del repositorio
-          </button>
+  <p>
+    <strong>⚠️ No modifica GitHub.</strong>
+  </p>
 
-          <div id="resultado">
-            Esperando prueba...
-          </div>
+  <button onclick="probarGemini()">
+    🚀 Analizar ${TEST_FILE} con Gemini
+  </button>
 
-          <script>
-            async function probarGitHub() {
-              const resultado = document.getElementById("resultado");
+  <div id="resultado">
+    Esperando prueba...
+  </div>
 
-              resultado.innerHTML = "⏳ Consultando GitHub...";
+<script>
 
-              try {
-                const response = await fetch("", {
-                  method: "POST"
-                });
+async function probarGemini() {
 
-                const data = await response.json();
+  const resultado =
+    document.getElementById("resultado");
 
-                if (!data.ok) {
-                  resultado.innerHTML =
-                    '<div class="error">❌ ' +
-                    JSON.stringify(data, null, 2) +
-                    '</div>';
+  resultado.innerHTML =
+    "<p>⏳ Leyendo archivo y consultando Gemini...</p>";
 
-                  return;
-                }
+  try {
 
-                resultado.innerHTML =
-                  '<div class="ok"><h2>✅ GitHub respondió correctamente</h2></div>' +
-                  '<p><strong>Repositorio:</strong> ' +
-                  data.repository +
-                  '</p>' +
-                  '<p><strong>Branch:</strong> ' +
-                  data.branch +
-                  '</p>' +
-                  '<p><strong>Elementos encontrados:</strong> ' +
-                  data.count +
-                  '</p>' +
-                  data.html;
+    const response = await fetch("", {
+      method: "POST"
+    });
 
-              } catch (error) {
-                resultado.innerHTML =
-                  '<div class="error">❌ Error del navegador: ' +
-                  error.message +
-                  '</div>';
-              }
-            }
-          </script>
-        </body>
-        </html>
+    const data = await response.json();
+
+    if (!data.ok) {
+
+      resultado.innerHTML =
+        '<div class="error">' +
+        "<h2>❌ Error</h2>" +
+        "<pre>" +
+        escapeHtml(JSON.stringify(data, null, 2)) +
+        "</pre>" +
+        "</div>";
+
+      return;
+    }
+
+    resultado.innerHTML =
+      '<div class="ok">' +
+      "<h2>✅ Análisis completado</h2>" +
+      "</div>" +
+
+      "<p><strong>Archivo:</strong> " +
+      escapeHtml(data.file) +
+      "</p>" +
+
+      "<p><strong>Modelo Gemini:</strong> " +
+      escapeHtml(data.model) +
+      "</p>" +
+
+      "<h3>Resultado de Gemini</h3>" +
+
+      "<pre>" +
+      escapeHtml(
+        JSON.stringify(data.fix, null, 2)
+      ) +
+      "</pre>";
+
+  } catch (error) {
+
+    resultado.innerHTML =
+      '<div class="error">' +
+      "<h2>❌ Error del navegador</h2>" +
+      "<pre>" +
+      escapeHtml(error.message) +
+      "</pre>" +
+      "</div>";
+  }
+}
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+</script>
+
+</body>
+</html>
       `, {
         headers: {
           "Content-Type": "text/html; charset=UTF-8"
@@ -285,28 +490,55 @@ export async function onRequest(context) {
       });
     }
 
+    // =========================
+    // PRUEBA GITHUB + GEMINI
+    // =========================
+
     if (context.request.method === "POST") {
-      const token = await createInstallationToken(context.env);
 
-      const items = await listGitHubContents(token);
+      // 1. Obtener token de GitHub
+      const token =
+        await createInstallationToken(context.env);
 
+      // 2. Leer archivo REAL del repositorio
+      const githubFile =
+        await getGitHubFile(
+          token,
+          TEST_FILE
+        );
+
+      // 3. Enviar código real a Gemini
+      const gemini =
+        await askGemini(
+          context.env,
+          githubFile.path,
+          githubFile.content
+        );
+
+      // 4. Responder resultado
       return new Response(
         JSON.stringify({
           ok: true,
-          stage: "github-list",
-          repository: `${GITHUB_OWNER}/${GITHUB_REPO}`,
+          stage: "github-gemini",
+          repository:
+            `${GITHUB_OWNER}/${GITHUB_REPO}`,
           branch: GITHUB_BRANCH,
-          count: items.length,
-          files: items.map(item => ({
-            name: item.name,
-            path: item.path,
-            type: item.type
-          })),
-          html: renderFiles(items)
+
+          file: githubFile.path,
+
+          sha: githubFile.sha,
+
+          contentLength:
+            githubFile.content.length,
+
+          model: gemini.model,
+
+          fix: gemini.fix
         }),
         {
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           }
         }
       );
@@ -320,12 +552,14 @@ export async function onRequest(context) {
       {
         status: 405,
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+            "application/json"
         }
       }
     );
 
   } catch (error) {
+
     return new Response(
       JSON.stringify({
         ok: false,
@@ -335,7 +569,8 @@ export async function onRequest(context) {
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+            "application/json"
         }
       }
     );
