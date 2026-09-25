@@ -1,18 +1,74 @@
-export async function onRequestGet() {
-  return new Response(
-    JSON.stringify({
-      ok: true,
-      message: "ai-fix-test funcionando",
-      next: "La función está lista para recibir errores mediante POST"
-    }),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json"
+export async function onRequestGet(context) {
+  try {
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models",
+      {
+        method: "GET",
+        headers: {
+          "x-goog-api-key": context.env.GEMINI_API_KEY
+        }
       }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          stage: "gemini-models",
+          error: data
+        }),
+        {
+          status: response.status,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
     }
-  );
+
+    const models = (data.models || []).map((model) => ({
+      name: model.name,
+      displayName: model.displayName,
+      supportedGenerationMethods:
+        model.supportedGenerationMethods
+    }));
+
+    return new Response(
+      JSON.stringify(
+        {
+          ok: true,
+          models
+        },
+        null,
+        2
+      ),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        ok: false,
+        stage: "cloudflare",
+        error: error.message
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+  }
 }
+
 
 export async function onRequestPost(context) {
   try {
@@ -91,7 +147,7 @@ Si no podés determinar una corrección segura:
 `;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
       {
         method: "POST",
         headers: {
