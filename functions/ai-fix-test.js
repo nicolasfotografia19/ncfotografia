@@ -1,3 +1,10 @@
+const GEMINI_MODELS = [
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.6-flash",
+  "gemini-3.5-flash"
+];
+
 export async function onRequestGet(context) {
   try {
     const response = await fetch(
@@ -146,97 +153,136 @@ Si no podés determinar una corrección segura:
 }
 `;
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": context.env.GEMINI_API_KEY
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
+    let lastError = null;
+
+    for (const model of GEMINI_MODELS) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": context.env.GEMINI_API_KEY
+            },
+            body: JSON.stringify({
+              contents: [
                 {
-                  text: prompt
+                  parts: [
+                    {
+                      text: prompt
+                    }
+                  ]
                 }
-              ]
+              ],
+              generationConfig: {
+                temperature: 0,
+                responseMimeType: "application/json"
+              }
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          lastError = {
+            model,
+            status: response.status,
+            error: data
+          };
+
+          if (
+            response.status === 429 ||
+            response.status === 500 ||
+            response.status === 502 ||
+            response.status === 503 ||
+            response.status === 504
+          ) {
+            continue;
+          }
+
+          return new Response(
+            JSON.stringify({
+              ok: false,
+              stage: "gemini",
+              model,
+              error: data
+            }),
+            {
+              status: response.status,
+              headers: {
+                "Content-Type": "application/json"
+              }
             }
-          ],
-          generationConfig: {
-            temperature: 0,
-            responseMimeType: "application/json"
+          );
+        }
+
+        const text =
+          data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!text) {
+          lastError = {
+            model,
+            error: "Gemini no devolvió contenido"
+          };
+
+          continue;
+        }
+
+        let fix;
+
+        try {
+          fix = JSON.parse(text);
+        } catch (error) {
+          return new Response(
+            JSON.stringify({
+              ok: false,
+              stage: "parse",
+              model,
+              rawResponse: text
+            }),
+            {
+              status: 500,
+              headers: {
+                "Content-Type": "application/json"
+              }
+            }
+          );
+        }
+
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            stage: "gemini",
+            model,
+            fix
+          }),
+          {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json"
+            }
           }
-        })
+        );
+
+      } catch (error) {
+        lastError = {
+          model,
+          error: error.message
+        };
       }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          stage: "gemini",
-          error: data
-        }),
-        {
-          status: response.status,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    }
-
-    const text =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!text) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          stage: "gemini",
-          error: "Gemini no devolvió contenido"
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    }
-
-    let fix;
-
-    try {
-      fix = JSON.parse(text);
-    } catch (error) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          stage: "parse",
-          rawResponse: text
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
     }
 
     return new Response(
       JSON.stringify({
-        ok: true,
+        ok: false,
         stage: "gemini",
-        fix
+        error: "Todos los modelos Gemini disponibles fallaron",
+        lastError
       }),
       {
-        status: 200,
+        status: 503,
         headers: {
           "Content-Type": "application/json"
         }
