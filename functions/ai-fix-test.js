@@ -6,76 +6,124 @@ const GEMINI_MODELS = [
 ];
 
 export async function onRequestGet(context) {
-  try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models",
-      {
-        method: "GET",
-        headers: {
-          "x-goog-api-key": context.env.GEMINI_API_KEY
+  const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>NC Fotografía - AI Fix Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      font-family: monospace;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      cursor: pointer;
+    }
+
+    pre {
+      background: #f4f4f4;
+      padding: 20px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>NC Fotografía — AI Fix Test</h1>
+
+<p>
+  Esta página prueba Sentry → Cloudflare → Gemini.
+</p>
+
+<textarea id="payload">{
+  "event": {
+    "message": "Cannot read properties of undefined",
+    "exception": {
+      "values": [
+        {
+          "value": "Cannot read properties of undefined (reading 'media_url')",
+          "stacktrace": {
+            "frames": [
+              {
+                "filename": "components/InstagramFeed.jsx",
+                "function": "fetchInstagramPosts",
+                "lineno": 42,
+                "colno": 18
+              }
+            ]
+          }
         }
-      }
-    );
+      ]
+    }
+  }
+}</textarea>
+
+<br>
+
+<button onclick="testGemini()">
+  Probar Gemini
+</button>
+
+<h2>Resultado</h2>
+
+<pre id="result">Esperando prueba...</pre>
+
+<script>
+async function testGemini() {
+  const result = document.getElementById("result");
+  const payloadText = document.getElementById("payload").value;
+
+  result.textContent = "Consultando Gemini...";
+
+  try {
+    const payload = JSON.parse(payloadText);
+
+    const response = await fetch("/ai-fix-test", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
 
     const data = await response.json();
 
-    if (!response.ok) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          stage: "gemini-models",
-          error: data
-        }),
-        {
-          status: response.status,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    }
-
-    const models = (data.models || []).map((model) => ({
-      name: model.name,
-      displayName: model.displayName,
-      supportedGenerationMethods:
-        model.supportedGenerationMethods
-    }));
-
-    return new Response(
-      JSON.stringify(
-        {
-          ok: true,
-          models
-        },
-        null,
-        2
-      ),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    result.textContent = JSON.stringify(data, null, 2);
 
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        ok: false,
-        stage: "cloudflare",
-        error: error.message
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    );
+    result.textContent =
+      "Error: " + error.message;
   }
 }
+</script>
 
+</body>
+</html>
+`;
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  });
+}
 
 export async function onRequestPost(context) {
   try {
@@ -252,12 +300,16 @@ Si no podés determinar una corrección segura:
         }
 
         return new Response(
-          JSON.stringify({
-            ok: true,
-            stage: "gemini",
-            model,
-            fix
-          }),
+          JSON.stringify(
+            {
+              ok: true,
+              stage: "gemini",
+              model,
+              fix
+            },
+            null,
+            2
+          ),
           {
             status: 200,
             headers: {
