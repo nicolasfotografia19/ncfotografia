@@ -427,47 +427,69 @@
 
     async function loadGallery() {
 
-      const loading =
-        document.getElementById('loading-indicator');
+  const loading =
+    document.getElementById('loading-indicator');
 
-      const errorBox =
-        document.getElementById('error-message');
+  const errorBox =
+    document.getElementById('error-message');
 
-      const errorText =
-        document.getElementById('error-text');
+  const errorText =
+    document.getElementById('error-text');
 
+  try {
 
-      const controller =
-        new AbortController();
+    loading.textContent =
+      'Sincronizando galería...';
 
+    const response =
+      await fetch(IG_API_URL);
 
-      const timeout =
-        setTimeout(() => {
+    if (!response.ok) {
 
-          controller.abort();
+      throw new Error(
+        `El servidor respondió con error HTTP ${response.status}.`
+      );
 
-        }, 12000);
+    }
 
+    const data =
+      await response.json();
 
-      try {
+    if (!Array.isArray(data)) {
 
-        loading.textContent =
-          'Sincronizando galería...';
+      throw new Error(
+        'La API no devolvió una lista de fotografías.'
+      );
 
+    }
 
-        const response =
-          await fetch(IG_API_URL, {
+    allPosts =
+      data;
 
-            method:
-              'GET',
+    loading.style.display =
+      'none';
 
-            signal:
-              controller.signal,
+    renderPosts(
+      allPosts,
+      true
+    );
 
-            cache:
-              'no-store'
+  } catch (err) {
 
-          });
+    loading.style.display =
+      'none';
+
+    errorText.textContent =
+      'No se pudo sincronizar el feed: ' +
+      err.message;
+
+    errorBox.classList.remove(
+      'hidden'
+    );
+
+  }
+
+}
 
 
         clearTimeout(timeout);
