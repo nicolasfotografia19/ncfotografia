@@ -1,131 +1,99 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 
 <head>
 
   <meta charset="UTF-8">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <meta name="description"
-        content="Nicolás Fotografía - Portafolio de fotografía editorial, arquitectura, retratos y estilo de vida. Mar del Plata, Argentina.">
+  <meta
+    name="description"
+    content="Nicolás Fotografía - Portafolio de fotografía editorial, arquitectura, retratos y estilo de vida. Mar del Plata, Argentina."
+  >
 
-  <link rel="icon"
-        type="image/svg+xml"
-        href="/logo.svg">
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="/logo.svg"
+  >
 
   <title>Nicolás Fotografía — Portafolio</title>
 
 
   <!-- =====================================================
-       SENTRY
-       Se carga después de que la página termina de cargar
-       ===================================================== -->
-
-  <script>
-
-    window.addEventListener('load', function () {
-
-      var script =
-        document.createElement('script');
-
-      script.src =
-        'https://browser.sentry-cdn.com/7.100.0/bundle.min.js';
-
-      script.crossOrigin =
-        'anonymous';
-
-      script.onload = function () {
-
-        Sentry.init({
-
-          dsn:
-            "https://77ca64b8b1ef19ae6322d6c94a717@ncfotografia.sentry.io/ncfotografia-web",
-
-          environment:
-            "production",
-
-          tracesSampleRate:
-            0.1
-
-        });
-
-      };
-
-      document.head.appendChild(script);
-
-    });
-
-  </script>
-
-
-  <!-- =====================================================
        TAILWIND
-       ===================================================== -->
+  ====================================================== -->
 
   <script src="https://cdn.tailwindcss.com"></script>
 
 
   <!-- =====================================================
        GOOGLE FONTS
-       ===================================================== -->
+  ====================================================== -->
 
-  <link rel="preconnect"
-        href="https://fonts.googleapis.com">
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
 
-  <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-        rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+    rel="stylesheet"
+  >
 
 
   <!-- =====================================================
        ESTILOS
-       ===================================================== -->
+  ====================================================== -->
 
   <style>
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
 
-      background-color:
-        #030305;
+      background-color: #030305;
 
       background-image:
         radial-gradient(
           circle at 50% -10%,
-          rgba(35, 35, 45, 0.45) 0%,
+          rgba(35,35,45,0.45) 0%,
           transparent 60%
         );
 
-      color:
-        #f4f4f5;
+      color: #f4f4f5;
 
-      font-family:
-        'Inter',
-        sans-serif;
+      font-family: 'Inter', sans-serif;
 
     }
 
 
     .font-serif {
-
-      font-family:
-        'Playfair Display',
-        serif;
-
+      font-family: 'Playfair Display', serif;
     }
 
 
+    /* ===================================================
+       MASONRY
+    ==================================================== */
+
     .masonry-grid {
 
-      column-count:
-        1;
+      column-count: 1;
 
-      column-gap:
-        2rem;
+      column-gap: 2rem;
 
     }
 
@@ -133,10 +101,7 @@
     @media (min-width: 640px) {
 
       .masonry-grid {
-
-        column-count:
-          2;
-
+        column-count: 2;
       }
 
     }
@@ -145,10 +110,7 @@
     @media (min-width: 1024px) {
 
       .masonry-grid {
-
-        column-count:
-          3;
-
+        column-count: 3;
       }
 
     }
@@ -156,44 +118,80 @@
 
     .masonry-item {
 
-      break-inside:
-        avoid;
+      break-inside: avoid;
 
-      margin-bottom:
-        2rem;
+      margin-bottom: 2rem;
 
-      display:
-        block;
+      display: block;
 
     }
 
 
-    main {
+    /* ===================================================
+       IMÁGENES
+    ==================================================== */
 
-      position:
-        relative;
+    .gallery-image {
 
-      display:
-        block;
+      display: block;
+
+      width: 100%;
+
+      height: auto;
+
+      object-fit: cover;
+
+      opacity: .85;
+
+      transition:
+        opacity .5s ease,
+        transform .7s ease;
 
     }
 
 
-    #menu-contenedor,
-    footer {
+    .masonry-item:hover .gallery-image {
 
-      position:
-        relative;
+      opacity: 1;
 
-      width:
-        100%;
+      transform: scale(1.03);
 
-      display:
-        block;
+    }
 
-      z-index:
-        20;
 
+    /* ===================================================
+       LIGHTBOX
+    ==================================================== */
+
+    #lightbox-image {
+
+      max-width: 90vw;
+
+      max-height: 75vh;
+
+      width: auto;
+
+      height: auto;
+
+      object-fit: contain;
+
+    }
+
+
+    /* ===================================================
+       SCROLLBAR
+    ==================================================== */
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #030305;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
     }
 
   </style>
@@ -201,90 +199,116 @@
 </head>
 
 
-<body class="min-h-screen flex flex-col relative">
+<body class="min-h-screen flex flex-col">
 
 
   <!-- =====================================================
-       TEXTURA DE FONDO
-       ===================================================== -->
+       TEXTURA
+  ====================================================== -->
 
   <div
-    class="fixed inset-0 pointer-events-none z-50 opacity-[0.038] mix-blend-screen"
-    style="background-image: url('data:image/svg+xml,...noise...');">
-  </div>
+    class="fixed inset-0 pointer-events-none z-50 opacity-[0.025] mix-blend-screen"
+    style="background-image:url('data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.85%27 numOctaves=%273%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E');"
+  ></div>
 
 
   <!-- =====================================================
        MENÚ
-       ===================================================== -->
+  ====================================================== -->
 
   <div id="menu-contenedor"></div>
 
 
   <!-- =====================================================
-       CONTENIDO PRINCIPAL
-       ===================================================== -->
+       CONTENIDO
+  ====================================================== -->
 
   <main
-    class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 md:px-12 md:py-16 relative z-10">
-
+    class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 md:px-12 md:py-16 relative z-10"
+  >
 
     <header
-      class="mb-14 pb-8 border-b border-white/[0.08]">
+      class="mb-14 pb-8 border-b border-white/[0.08]"
+    >
 
+      <div class="flex items-center gap-3 mb-3">
 
-      <div>
+        <span class="inline-block w-6 h-[1px] bg-white/40"></span>
 
-        <!-- Acá permanece el contenido original de tu encabezado -->
+        <span
+          class="text-[10px] uppercase tracking-[0.4em] text-zinc-400 font-mono"
+        >
+          Diario Visual • Portafolio
+        </span>
 
       </div>
 
 
+      <h1
+        class="text-4xl md:text-5xl font-serif text-white mb-4 leading-tight font-light"
+      >
+
+        Arquitectura, retratos y
+
+        <span class="italic">
+          atmósferas visuales.
+        </span>
+
+      </h1>
+
+
+      <p
+        class="text-sm text-zinc-400 font-light max-w-2xl leading-relaxed"
+      >
+
+        Una colección fotográfica pura basada en la luz natural,
+        los contrastes honestos y la estética documental.
+
+      </p>
+
+
       <!-- =================================================
            FILTROS
-           ================================================= -->
+      ================================================== -->
 
       <div
+        id="filter-buttons"
         class="mt-8 flex flex-wrap gap-3"
-        id="filter-buttons">
+      >
 
         <button
           onclick="filterPosts('Todas')"
           data-category="Todas"
-          class="...">
-
+          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white border-b border-white"
+        >
           Todas
-
         </button>
 
 
         <button
           onclick="filterPosts('Arquitectura')"
           data-category="Arquitectura"
-          class="...">
-
+          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white/40 hover:text-white"
+        >
           Arquitectura
-
         </button>
 
 
         <button
           onclick="filterPosts('Retratos')"
           data-category="Retratos"
-          class="...">
-
+          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white/40 hover:text-white"
+        >
           Retratos
-
         </button>
 
 
         <button
           onclick="filterPosts('Estilo de vida')"
           data-category="Estilo de vida"
-          class="...">
-
+          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white/40 hover:text-white"
+        >
           Estilo de vida
-
         </button>
 
       </div>
@@ -294,24 +318,24 @@
 
     <!-- =====================================================
          LOADING
-         ===================================================== -->
+    ====================================================== -->
 
     <div
       id="loading-indicator"
-      class="text-center text-xs text-zinc-500 font-mono py-20">
-
+      class="text-center py-20 text-xs text-white/50 tracking-widest uppercase font-mono"
+    >
       Sincronizando galería...
-
     </div>
 
 
     <!-- =====================================================
          ERROR
-         ===================================================== -->
+    ====================================================== -->
 
     <div
       id="error-message"
-      class="hidden text-center text-xs text-red-400 font-mono py-20">
+      class="hidden text-center py-20 text-red-400 text-xs font-mono"
+    >
 
       <span id="error-text"></span>
 
@@ -320,55 +344,74 @@
 
     <!-- =====================================================
          GALERÍA
-         ===================================================== -->
+    ====================================================== -->
 
     <div
       id="gallery-container"
-      class="masonry-grid relative pb-16">
-    </div>
-
+      class="masonry-grid relative pb-16"
+    ></div>
 
   </main>
 
 
   <!-- =====================================================
        LIGHTBOX
-       ===================================================== -->
+  ====================================================== -->
 
   <div
     id="lightbox"
-    class="hidden fixed inset-0 z-50 items-center justify-center bg-black/95 p-4">
-
+    class="hidden fixed inset-0 z-50 bg-[#030305]/95 backdrop-blur-xl flex-col items-center justify-center p-6"
+  >
 
     <button
       onclick="closeLightbox()"
-      class="absolute top-6 right-6 text-white/70 hover:text-white text-2xl z-50">
+      aria-label="Cerrar"
+      class="absolute top-8 right-8 text-white/70 hover:text-white p-2"
+    >
 
-      ×
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+
+        <line
+          x1="18"
+          y1="6"
+          x2="6"
+          y2="18"
+        ></line>
+
+        <line
+          x1="6"
+          y1="6"
+          x2="18"
+          y2="18"
+        ></line>
+
+      </svg>
 
     </button>
 
 
     <div
-      class="w-full max-w-6xl flex flex-col items-center">
+      id="lightbox-media-container"
+      class="w-full max-w-5xl flex justify-center mt-8"
+    ></div>
 
 
-      <div
-        id="lightbox-media-container"
-        class="flex items-center justify-center w-full">
-      </div>
-
-
-      <p
-        id="lightbox-date"
-        class="text-xs text-zinc-500 font-mono mt-4">
-      </p>
-
+    <div
+      class="mt-6 text-center max-w-2xl w-full"
+    >
 
       <p
         id="lightbox-caption"
-        class="text-sm text-zinc-300 mt-2 text-center max-w-2xl">
-      </p>
+        class="text-sm text-zinc-300 font-light mb-4"
+      ></p>
 
 
       <a
@@ -376,10 +419,9 @@
         href="#"
         target="_blank"
         rel="noopener noreferrer"
-        class="mt-4 text-xs text-zinc-400 hover:text-white">
-
+        class="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-white border-b border-white/30 hover:border-white transition-all pb-1"
+      >
         Ver en Instagram
-
       </a>
 
     </div>
@@ -389,112 +431,204 @@
 
   <!-- =====================================================
        MENÚ EXTERNO
-       ===================================================== -->
+  ====================================================== -->
 
   <script src="/fetch-menu.js"></script>
 
 
   <!-- =====================================================
-       JAVASCRIPT PRINCIPAL
-       ===================================================== -->
+       GALERÍA
+  ====================================================== -->
 
   <script>
 
+    /*
+     * =====================================================
+     * CONFIGURACIÓN
+     * =====================================================
+     */
+
     const IG_API_URL =
-      'https://script.google.com/macros/s/AKfycbxBM4NG4tD2KjWuDO76ml20Ln96aKPKBYJBFT4ToNWYNRQVuEVbniImYW_9GcSuaXA2Q/exec';
+      'https://script.google.com/macros/s/AKfycbxBM4NG4tD2KjWuDO76ml20Ln96aKPKBYJBFT4ToKNwYNRQVuEVbniImYW_9GcSuaXA2Q/exec';
 
 
-    const POSTS_PER_BATCH =
-      9;
+    const POSTS_PER_BATCH = 9;
 
 
-    let allPosts =
-      [];
+    let allPosts = [];
 
-    let currentPosts =
-      [];
+    let currentPosts = [];
 
-    let renderedCount =
-      0;
+    let renderedCount = 0;
 
-    let loadMoreObserver =
-      null;
+    let loadMoreObserver = null;
 
 
-    /* =====================================================
-       CARGAR GALERÍA
-       ===================================================== */
+    /*
+     * =====================================================
+     * CARGAR GALERÍA
+     *
+     * Usamos JSONP en lugar de fetch().
+     *
+     * Esto evita el problema de CORS de Google Apps Script.
+     * =====================================================
+     */
 
- async function loadGallery() {
+    function loadGallery() {
 
-  const loading =
-    document.getElementById('loading-indicator');
+      const loading =
+        document.getElementById(
+          'loading-indicator'
+        );
 
-  const errorBox =
-    document.getElementById('error-message');
+      const errorBox =
+        document.getElementById(
+          'error-message'
+        );
 
-  const errorText =
-    document.getElementById('error-text');
+      const errorText =
+        document.getElementById(
+          'error-text'
+        );
 
-  try {
 
-    loading.textContent =
-      'Sincronizando galería...';
+      const callbackName =
+        '__instagramGallery_' +
+        Date.now();
 
-    const response =
-      await fetch(IG_API_URL);
 
-    if (!response.ok) {
+      window[callbackName] =
+        function(data) {
 
-      throw new Error(
-        `El servidor respondió con error HTTP ${response.status}.`
+          try {
+
+            if (!Array.isArray(data)) {
+
+              throw new Error(
+                'La API no devolvió una lista de fotografías.'
+              );
+
+            }
+
+
+            allPosts = data;
+
+
+            loading.style.display =
+              'none';
+
+
+            errorBox.classList.add(
+              'hidden'
+            );
+
+
+            renderPosts(
+              allPosts,
+              true
+            );
+
+
+          } catch (error) {
+
+            loading.style.display =
+              'none';
+
+            errorText.textContent =
+              'No se pudo cargar la galería: ' +
+              error.message;
+
+            errorBox.classList.remove(
+              'hidden'
+            );
+
+          }
+
+
+          /*
+           * Limpiamos el callback después de usarlo.
+           */
+
+          try {
+
+            delete window[callbackName];
+
+            script.remove();
+
+          } catch (cleanupError) {
+
+            /* No hacemos nada */
+
+          }
+
+        };
+
+
+      /*
+       * Creamos un <script>.
+       *
+       * A diferencia de fetch(),
+       * los scripts externos no tienen el mismo
+       * problema de CORS.
+       */
+
+      const script =
+        document.createElement('script');
+
+
+      script.src =
+        IG_API_URL +
+        '?callback=' +
+        encodeURIComponent(callbackName) +
+        '&_=' +
+        Date.now();
+
+
+      script.async = true;
+
+
+      script.onerror =
+        function() {
+
+          try {
+
+            delete window[callbackName];
+
+            script.remove();
+
+          } catch (cleanupError) {
+
+            /* No hacemos nada */
+
+          }
+
+
+          loading.style.display =
+            'none';
+
+
+          errorText.textContent =
+            'No se pudo conectar con Google Apps Script.';
+
+          errorBox.classList.remove(
+            'hidden'
+          );
+
+        };
+
+
+      document.head.appendChild(
+        script
       );
 
     }
 
-    const data =
-      await response.json();
 
-    if (!Array.isArray(data)) {
-
-      throw new Error(
-        'La API no devolvió una lista de fotografías.'
-      );
-
-    }
-
-    allPosts =
-      data;
-
-    loading.style.display =
-      'none';
-
-    renderPosts(
-      allPosts,
-      true
-    );
-
-  } catch (err) {
-
-    loading.style.display =
-      'none';
-
-    errorText.textContent =
-      'No se pudo sincronizar el feed: ' +
-      err.message;
-
-    errorBox.classList.remove(
-      'hidden'
-    );
-
-  }
-
-}
-
-
-    /* =====================================================
-       RENDERIZAR GALERÍA POR TANDAS
-       ===================================================== */
+    /*
+     * =====================================================
+     * RENDERIZAR GALERÍA POR TANDAS
+     * =====================================================
+     */
 
     function renderPosts(
       posts,
@@ -544,6 +678,12 @@
       }
 
 
+      /*
+       * ===================================================
+       * SIN PUBLICACIONES
+       * ===================================================
+       */
+
       if (
         currentPosts.length === 0
       ) {
@@ -551,10 +691,9 @@
         container.innerHTML = `
 
           <div
-            class="col-span-full text-center text-xs text-zinc-500 font-mono">
-
+            class="text-center text-xs text-zinc-500 font-mono py-20"
+          >
             No hay publicaciones disponibles.
-
           </div>
 
         `;
@@ -564,6 +703,12 @@
       }
 
 
+      /*
+       * ===================================================
+       * SIGUIENTE TANDA
+       * ===================================================
+       */
+
       const nextPosts =
         currentPosts.slice(
           renderedCount,
@@ -572,12 +717,16 @@
 
 
       nextPosts.forEach(
-        (post, localIndex) => {
+        function(post, localIndex) {
 
           const index =
             renderedCount +
             localIndex;
 
+
+          /*
+           * URL DE LA FOTO
+           */
 
           const imgUrl =
             post.media_type === 'VIDEO'
@@ -585,9 +734,9 @@
               : post.media_url;
 
 
-          const caption =
-            post.caption || '';
-
+          /*
+           * CONTENEDOR
+           */
 
           const item =
             document.createElement(
@@ -600,8 +749,16 @@
 
 
           item.onclick =
-            () => openLightbox(post);
+            function() {
 
+              openLightbox(post);
+
+            };
+
+
+          /*
+           * IMAGEN
+           */
 
           const img =
             document.createElement(
@@ -614,10 +771,20 @@
 
 
           img.alt =
-            caption
-              ? caption.substring(0, 80)
+            post.caption
+              ? post.caption.substring(
+                  0,
+                  80
+                )
               : 'Fotografía de Nicolás';
 
+
+          /*
+           * LAS PRIMERAS DOS:
+
+           * carga inmediata
+           * prioridad alta
+           */
 
           if (index < 2) {
 
@@ -647,8 +814,26 @@
 
 
           img.className =
-            'w-full h-auto object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out';
+            'gallery-image';
 
+
+          /*
+           * Si una imagen falla,
+           * simplemente ocultamos el elemento.
+           */
+
+          img.onerror =
+            function() {
+
+              item.style.display =
+                'none';
+
+            };
+
+
+          /*
+           * OVERLAY
+           */
 
           const overlay =
             document.createElement(
@@ -657,7 +842,34 @@
 
 
           overlay.className =
-            'absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-700 pointer-events-none';
+            'absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none';
+
+
+          /*
+           * CAPTION
+           */
+
+          if (post.caption) {
+
+            const caption =
+              document.createElement(
+                'div'
+              );
+
+
+            caption.className =
+              'absolute bottom-0 left-0 right-0 p-5 text-xs text-white/90 font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none';
+
+
+            caption.textContent =
+              post.caption;
+
+
+            item.appendChild(
+              caption
+            );
+
+          }
 
 
           item.appendChild(
@@ -678,141 +890,174 @@
       );
 
 
+      /*
+       * Actualizamos cantidad renderizada.
+       */
+
       renderedCount +=
         nextPosts.length;
 
+
+      /*
+       * ===================================================
+       * ¿QUEDAN MÁS FOTOS?
+       * ===================================================
+       */
 
       if (
         renderedCount <
         currentPosts.length
       ) {
 
-        let loadMoreTrigger =
-          document.getElementById(
-            'load-more-trigger'
-          );
-
-
-        if (!loadMoreTrigger) {
-
-          loadMoreTrigger =
-            document.createElement(
-              'div'
-            );
-
-
-          loadMoreTrigger.id =
-            'load-more-trigger';
-
-
-          loadMoreTrigger.className =
-            'w-full h-20 flex items-center justify-center';
-
-
-          container.parentNode.insertBefore(
-            loadMoreTrigger,
-            container.nextSibling
-          );
-
-        }
-
-
-        loadMoreObserver =
-          new IntersectionObserver(
-            (entries) => {
-
-              if (
-                entries[0].isIntersecting
-              ) {
-
-                loadMoreObserver.disconnect();
-
-                renderPosts(
-                  currentPosts,
-                  false
-                );
-
-              }
-
-            },
-            {
-              rootMargin:
-                '800px 0px'
-            }
-          );
-
-
-        loadMoreObserver.observe(
-          loadMoreTrigger
+        createLoadMoreTrigger(
+          container
         );
-
-
-      } else {
-
-        const trigger =
-          document.getElementById(
-            'load-more-trigger'
-          );
-
-
-        if (trigger) {
-
-          trigger.remove();
-
-        }
 
       }
 
     }
 
 
-    /* =====================================================
-       FILTROS
-       ===================================================== */
+    /*
+     * =====================================================
+     * TRIGGER DE CARGA
+     * =====================================================
+     */
+
+    function createLoadMoreTrigger(
+      container
+    ) {
+
+      const oldTrigger =
+        document.getElementById(
+          'load-more-trigger'
+        );
+
+
+      if (oldTrigger) {
+
+        oldTrigger.remove();
+
+      }
+
+
+      const trigger =
+        document.createElement(
+          'div'
+        );
+
+
+      trigger.id =
+        'load-more-trigger';
+
+
+      trigger.style.height =
+        '1px';
+
+
+      trigger.style.width =
+        '100%';
+
+
+      container.appendChild(
+        trigger
+      );
+
+
+      loadMoreObserver =
+        new IntersectionObserver(
+          function(entries) {
+
+            if (
+              entries[0].isIntersecting
+            ) {
+
+              loadMoreObserver.disconnect();
+
+              loadMoreObserver =
+                null;
+
+              renderPosts(
+                currentPosts,
+                false
+              );
+
+            }
+
+          },
+          {
+            rootMargin:
+              '1000px 0px'
+          }
+        );
+
+
+      loadMoreObserver.observe(
+        trigger
+      );
+
+    }
+
+
+    /*
+     * =====================================================
+     * FILTROS
+     * =====================================================
+     */
 
     function filterPosts(
       category
     ) {
 
-      const buttons =
-        document.querySelectorAll(
-          '#filter-buttons button'
+      /*
+       * Actualizamos botones.
+       */
+
+      document
+        .querySelectorAll(
+          '.filter-btn'
+        )
+        .forEach(
+          function(button) {
+
+            const active =
+              button.dataset.category ===
+              category;
+
+
+            if (active) {
+
+              button.classList.add(
+                'text-white',
+                'border-b',
+                'border-white'
+              );
+
+              button.classList.remove(
+                'text-white/40'
+              );
+
+            } else {
+
+              button.classList.remove(
+                'text-white',
+                'border-b',
+                'border-white'
+              );
+
+              button.classList.add(
+                'text-white/40'
+              );
+
+            }
+
+          }
         );
 
 
-      buttons.forEach(
-        button => {
-
-          if (
-            button.dataset.category ===
-            category
-          ) {
-
-            button.classList.add(
-              'bg-white',
-              'text-black'
-            );
-
-            button.classList.remove(
-              'text-zinc-400'
-            );
-
-          } else {
-
-            button.classList.remove(
-              'bg-white',
-              'text-black'
-            );
-
-            button.classList.add(
-              'text-zinc-400'
-            );
-
-          }
-
-        }
-      );
-
+      /*
+       * Todas
+       */
 
       if (
         category === 'Todas'
@@ -828,9 +1073,13 @@
       }
 
 
+      /*
+       * Filtramos por caption.
+       */
+
       const filtered =
         allPosts.filter(
-          post => {
+          function(post) {
 
             const caption =
               (
@@ -855,9 +1104,11 @@
     }
 
 
-    /* =====================================================
-       LIGHTBOX
-       ===================================================== */
+    /*
+     * =====================================================
+     * LIGHTBOX
+     * =====================================================
+     */
 
     function openLightbox(
       post
@@ -893,14 +1144,40 @@
           : post.media_url;
 
 
-      mediaContainer.innerHTML = `
+      mediaContainer.innerHTML =
+        '';
 
-        <img
-          src="${imgUrl}"
-          class="max-h-[75vh] w-auto object-contain rounded-sm"
-          alt="Fotografía">
 
-      `;
+      const image =
+        document.createElement(
+          'img'
+        );
+
+
+      image.id =
+        'lightbox-image';
+
+
+      image.src =
+        imgUrl;
+
+
+      image.alt =
+        post.caption
+          ? post.caption.substring(
+              0,
+              100
+            )
+          : 'Fotografía';
+
+
+      image.decoding =
+        'async';
+
+
+      mediaContainer.appendChild(
+        image
+      );
 
 
       captionEl.textContent =
@@ -909,7 +1186,8 @@
 
 
       linkEl.href =
-        post.permalink;
+        post.permalink ||
+        '#';
 
 
       lightbox.classList.remove(
@@ -923,6 +1201,12 @@
 
     }
 
+
+    /*
+     * =====================================================
+     * CERRAR LIGHTBOX
+     * =====================================================
+     */
 
     function closeLightbox() {
 
@@ -950,20 +1234,15 @@
     }
 
 
-    /* =====================================================
-       INICIAR
-       ===================================================== */
-
-    loadGallery();
-
-
-    /* =====================================================
-       CERRAR LIGHTBOX CON ESC
-       ===================================================== */
+    /*
+     * =====================================================
+     * TECLA ESC
+     * =====================================================
+     */
 
     document.addEventListener(
       'keydown',
-      function (event) {
+      function(event) {
 
         if (
           event.key === 'Escape'
@@ -977,15 +1256,90 @@
     );
 
 
-    /* =====================================================
-       DESACTIVAR MENÚ CONTEXTUAL
-       ===================================================== */
+    /*
+     * =====================================================
+     * INICIAR
+     * =====================================================
+     */
+
+    loadGallery();
+
+
+  </script>
+
+
+  <!-- =====================================================
+       BLOQUEAR CLIC DERECHO
+  ====================================================== -->
+
+  <script>
 
     document.addEventListener(
       'contextmenu',
-      function (e) {
+      function(event) {
 
-        e.preventDefault();
+        event.preventDefault();
+
+      }
+    );
+
+  </script>
+
+
+  <!-- =====================================================
+       SENTRY
+       Se carga DESPUÉS de que todo lo demás está listo.
+  ====================================================== -->
+
+  <script>
+
+    window.addEventListener(
+      'load',
+      function() {
+
+        const script =
+          document.createElement(
+            'script'
+          );
+
+
+        script.src =
+          'https://browser.sentry-cdn.com/7.100.0/bundle.min.js';
+
+
+        script.crossOrigin =
+          'anonymous';
+
+
+        script.onload =
+          function() {
+
+            if (
+              typeof Sentry !==
+              'undefined'
+            ) {
+
+              Sentry.init({
+
+                dsn:
+                  'https://77ca64b8b1ef19ae6322d6c94a717@ncfotografia.sentry.io/ncfotografia-web',
+
+                environment:
+                  'production',
+
+                tracesSampleRate:
+                  0.1
+
+              });
+
+            }
+
+          };
+
+
+        document.head.appendChild(
+          script
+        );
 
       }
     );
