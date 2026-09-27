@@ -436,61 +436,134 @@
   const errorText =
     document.getElementById('error-text');
 
-  try {
 
-    loading.textContent =
-      'Sincronizando galería...';
+  loading.textContent =
+    'Sincronizando galería...';
 
-    const response =
-      await fetch(IG_API_URL);
 
-    if (!response.ok) {
+  /*
+   * Nombre único para esta llamada JSONP.
+   */
 
-      throw new Error(
-        `El servidor respondió con error HTTP ${response.status}.`
+  const callbackName =
+    'instagramCallback_' +
+    Date.now();
+
+
+  /*
+   * Creamos la función que Google Apps Script
+   * va a ejecutar cuando devuelva los datos.
+   */
+
+  window[callbackName] =
+    function(data) {
+
+      try {
+
+        if (!Array.isArray(data)) {
+
+          throw new Error(
+            'La API no devolvió una lista de fotografías.'
+          );
+
+        }
+
+
+        allPosts =
+          data;
+
+
+        loading.style.display =
+          'none';
+
+
+        renderPosts(
+          allPosts,
+          true
+        );
+
+
+      } catch (err) {
+
+        loading.style.display =
+          'none';
+
+
+        errorText.textContent =
+          'No se pudo sincronizar el feed: ' +
+          err.message;
+
+
+        errorBox.classList.remove(
+          'hidden'
+        );
+
+      }
+
+
+      /*
+       * Limpiamos la función después de usarla.
+       */
+
+      delete window[callbackName];
+
+      script.remove();
+
+    };
+
+
+  /*
+   * Creamos un <script>.
+   *
+   * A diferencia de fetch(),
+   * esto no está bloqueado por CORS.
+   */
+
+  const script =
+    document.createElement('script');
+
+
+  script.src =
+    IG_API_URL +
+    '?callback=' +
+    encodeURIComponent(callbackName) +
+    '&t=' +
+    Date.now();
+
+
+  /*
+   * Si Google no responde,
+   * mostramos un error.
+   */
+
+  script.onerror =
+    function() {
+
+      loading.style.display =
+        'none';
+
+
+      errorText.textContent =
+        'No se pudo conectar con Google Apps Script.';
+
+
+      errorBox.classList.remove(
+        'hidden'
       );
 
-    }
 
-    const data =
-      await response.json();
+      delete window[callbackName];
 
-    if (!Array.isArray(data)) {
+      script.remove();
 
-      throw new Error(
-        'La API no devolvió una lista de fotografías.'
-      );
+    };
 
-    }
 
-    allPosts =
-      data;
-
-    loading.style.display =
-      'none';
-
-    renderPosts(
-      allPosts,
-      true
-    );
-
-  } catch (err) {
-
-    loading.style.display =
-      'none';
-
-    errorText.textContent =
-      'No se pudo sincronizar el feed: ' +
-      err.message;
-
-    errorBox.classList.remove(
-      'hidden'
-    );
-
-  }
+  document.body.appendChild(
+    script
+  );
 
 }
-
 
     /* =====================================================
        RENDERIZAR GALERÍA POR TANDAS
