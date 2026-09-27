@@ -1345,7 +1345,11 @@
     );
 
   </script>
-
+<script>
+  setTimeout(function () {
+    throw new Error('Sentry Seer test - error controlado');
+  }, 5000);
+</script>
 </body>
 
 </html>
