@@ -425,7 +425,7 @@
        CARGAR GALERÍA
        ===================================================== */
 
-  async function loadGallery() {
+ async function loadGallery() {
 
   const loading =
     document.getElementById('loading-indicator');
@@ -436,70 +436,60 @@
   const errorText =
     document.getElementById('error-text');
 
+  try {
 
-  loading.textContent =
-    'Sincronizando galería...';
+    loading.textContent =
+      'Sincronizando galería...';
 
+    const response =
+      await fetch(IG_API_URL);
 
-  /*
-   * Nombre único para esta llamada JSONP.
-   */
+    if (!response.ok) {
 
-  const callbackName =
-    'instagramCallback_' +
-    Date.now();
+      throw new Error(
+        `El servidor respondió con error HTTP ${response.status}.`
+      );
 
+    }
 
-  /*
-   * Creamos la función que Google Apps Script
-   * va a ejecutar cuando devuelva los datos.
-   */
+    const data =
+      await response.json();
 
-  window[callbackName] =
-    function(data) {
+    if (!Array.isArray(data)) {
 
-      try {
+      throw new Error(
+        'La API no devolvió una lista de fotografías.'
+      );
 
-        if (!Array.isArray(data)) {
+    }
 
-          throw new Error(
-            'La API no devolvió una lista de fotografías.'
-          );
+    allPosts =
+      data;
 
-        }
+    loading.style.display =
+      'none';
 
+    renderPosts(
+      allPosts,
+      true
+    );
 
-        allPosts =
-          data;
+  } catch (err) {
 
+    loading.style.display =
+      'none';
 
-        loading.style.display =
-          'none';
+    errorText.textContent =
+      'No se pudo sincronizar el feed: ' +
+      err.message;
 
+    errorBox.classList.remove(
+      'hidden'
+    );
 
-        renderPosts(
-          allPosts,
-          true
-        );
+  }
 
-
-      } catch (err) {
-
-        loading.style.display =
-          'none';
-
-
-        errorText.textContent =
-          'No se pudo sincronizar el feed: ' +
-          err.message;
-
-
-        errorBox.classList.remove(
-          'hidden'
-        );
-
-      }
-
+}
 
       /*
        * Limpiamos la función después de usarla.
