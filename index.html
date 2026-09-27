@@ -491,69 +491,6 @@
 
 }
 
-      /*
-       * Limpiamos la función después de usarla.
-       */
-
-      delete window[callbackName];
-
-      script.remove();
-
-    };
-
-
-  /*
-   * Creamos un <script>.
-   *
-   * A diferencia de fetch(),
-   * esto no está bloqueado por CORS.
-   */
-
-  const script =
-    document.createElement('script');
-
-
-  script.src =
-    IG_API_URL +
-    '?callback=' +
-    encodeURIComponent(callbackName) +
-    '&t=' +
-    Date.now();
-
-
-  /*
-   * Si Google no responde,
-   * mostramos un error.
-   */
-
-  script.onerror =
-    function() {
-
-      loading.style.display =
-        'none';
-
-
-      errorText.textContent =
-        'No se pudo conectar con Google Apps Script.';
-
-
-      errorBox.classList.remove(
-        'hidden'
-      );
-
-
-      delete window[callbackName];
-
-      script.remove();
-
-    };
-
-
-  document.body.appendChild(
-    script
-  );
-
-}
 
     /* =====================================================
        RENDERIZAR GALERÍA POR TANDAS
