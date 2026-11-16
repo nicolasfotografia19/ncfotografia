@@ -1,49 +1,51 @@
 /**
- * Nicolás Fotografía - Cargador de Menú con Cache y Detección de Página Activa
+ * Nicolás Fotografía — Cargador de menú con caché y detección de página activa
  */
 (function () {
-  const CACHE_KEY = 'ncfotografia_menu_html_v5';
+  const CACHE_KEY = 'ncfotografia_menu_html_v7';
+
+  // "/contacto.html", "/contacto", "/contacto/" -> "/contacto"
+  function normalize(path) {
+    let p = (path || '/').replace(/\/+$/, '').replace(/\.html$/, '');
+    if (p === '' || p === '/index') p = '/';
+    return p;
+  }
 
   function setupMenu(container) {
-    const currentPath = window.location.pathname;
-    const navLinks = container.querySelectorAll('.nav-link');
+    const current = normalize(window.location.pathname);
 
-    navLinks.forEach(link => {
-      const dataPath = link.getAttribute('data-path');
-      const isHome = (currentPath === '/' || currentPath === '/index.html' || currentPath === '') && dataPath === '/';
-      const isMatch = dataPath !== '/' && currentPath.includes(dataPath.replace('/', ''));
-
-      if (isHome || isMatch) {
-        link.classList.remove('text-zinc-400');
-        link.classList.add('text-white', 'font-medium');
-        
-        // Indicador activo sutil
-        const indicator = document.createElement('span');
-        indicator.className = 'absolute bottom-0 left-0 w-full h-[1.5px] bg-white rounded-full';
-        link.appendChild(indicator);
-      } else {
-        link.classList.add('text-zinc-400');
-        link.classList.remove('text-white', 'font-medium');
-      }
+    container.querySelectorAll('[data-path]').forEach(function (link) {
+      const active = normalize(link.getAttribute('data-path')) === current;
+      link.classList.toggle('is-active', active);
+      if (active) link.setAttribute('aria-current', 'page');
     });
 
-    // Control Móvil
-    const toggleBtn = container.querySelector('#mobile-menu-toggle');
+    const toggle = container.querySelector('#mobile-menu-toggle');
     const drawer = container.querySelector('#mobile-menu-drawer');
-    const closeBtn = container.querySelector('#mobile-menu-close');
+    const close  = container.querySelector('#mobile-menu-close');
+    if (!toggle || !drawer) return;
 
-    if (toggleBtn && drawer) {
-      toggleBtn.addEventListener('click', () => {
-        drawer.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-      });
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          drawer.classList.add('hidden');
-          document.body.style.overflow = '';
-        });
-      }
+    function open() {
+      drawer.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      if (close) close.focus();
     }
+    function shut() {
+      drawer.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    toggle.addEventListener('click', open);
+    if (close) close.addEventListener('click', shut);
+    drawer.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', shut); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) shut();
+    });
+    window.matchMedia('(min-width: 900px)').addEventListener('change', function (mq) {
+      if (mq.matches) shut();
+    });
   }
 
   function render(html) {
@@ -54,17 +56,15 @@
   }
 
   async function loadMenu() {
-    const cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) {
-      render(cached);
-      return;
-    }
+    let cached = null;
+    try { cached = sessionStorage.getItem(CACHE_KEY); } catch (e) {}
+    if (cached) { render(cached); return; }
 
     try {
       const res = await fetch('/menu.html');
-      if (!res.ok) throw new Error('Menu no disponible');
+      if (!res.ok) throw new Error('Menú no disponible');
       const html = await res.text();
-      sessionStorage.setItem(CACHE_KEY, html);
+      try { sessionStorage.setItem(CACHE_KEY, html); } catch (e) {}
       render(html);
     } catch (e) {
       console.error('Error al cargar menú:', e);

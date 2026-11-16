@@ -1,1351 +1,331 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="description"
-    content="Nicolás Fotografía - Portafolio de fotografía editorial, arquitectura, retratos y estilo de vida. Mar del Plata, Argentina."
-  >
-
-  <link
-    rel="icon"
-    type="image/svg+xml"
-    href="/logo.svg"
-  >
-
-  <title>Nicolás Fotografía — Portafolio</title>
-
-
-  <!-- =====================================================
-       TAILWIND
-  ====================================================== -->
-
-  <script src="https://cdn.tailwindcss.com"></script>
-
-
-  <!-- =====================================================
-       GOOGLE FONTS
-  ====================================================== -->
-
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
-
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-    rel="stylesheet"
-  >
-
-
-  <!-- =====================================================
-       ESTILOS
-  ====================================================== -->
-
-  <style>
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-
-      background-color: #030305;
-
-      background-image:
-        radial-gradient(
-          circle at 50% -10%,
-          rgba(35,35,45,0.45) 0%,
-          transparent 60%
-        );
-
-      color: #f4f4f5;
-
-      font-family: 'Inter', sans-serif;
-
-    }
-
-
-    .font-serif {
-      font-family: 'Playfair Display', serif;
-    }
-
-
-    /* ===================================================
-       MASONRY
-    ==================================================== */
-
-    .masonry-grid {
-
-      column-count: 1;
-
-      column-gap: 2rem;
-
-    }
-
-
-    @media (min-width: 640px) {
-
-      .masonry-grid {
-        column-count: 2;
-      }
-
-    }
-
-
-    @media (min-width: 1024px) {
-
-      .masonry-grid {
-        column-count: 3;
-      }
-
-    }
-
-
-    .masonry-item {
-
-      break-inside: avoid;
-
-      margin-bottom: 2rem;
-
-      display: block;
-
-    }
-
-
-    /* ===================================================
-       IMÁGENES
-    ==================================================== */
-
-    .gallery-image {
-
-      display: block;
-
-      width: 100%;
-
-      height: auto;
-
-      object-fit: cover;
-
-      opacity: .85;
-
-      transition:
-        opacity .5s ease,
-        transform .7s ease;
-
-    }
-
-
-    .masonry-item:hover .gallery-image {
-
-      opacity: 1;
-
-      transform: scale(1.03);
-
-    }
-
-
-    /* ===================================================
-       LIGHTBOX
-    ==================================================== */
-
-    #lightbox-image {
-
-      max-width: 90vw;
-
-      max-height: 75vh;
-
-      width: auto;
-
-      height: auto;
-
-      object-fit: contain;
-
-    }
-
-
-    /* ===================================================
-       SCROLLBAR
-    ==================================================== */
-
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #030305;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #333;
-    }
-
-  </style>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nicolás Fotografía - Portafolio de fotografía editorial, arquitectura, retratos y estilo de vida. Mar del Plata, Argentina.">
+  <meta name="theme-color" content="#0C0C0D">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <title>Nicolás Fotografía – Portafolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 
+<body>
+  <div class="grain" aria-hidden="true"></div>
 
-<body class="min-h-screen flex flex-col">
-
-
-  <!-- =====================================================
-       TEXTURA
-  ====================================================== -->
-
-  <div
-    class="fixed inset-0 pointer-events-none z-50 opacity-[0.025] mix-blend-screen"
-    style="background-image:url('data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.85%27 numOctaves=%273%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E');"
-  ></div>
-
-
-  <!-- =====================================================
-       MENÚ
-  ====================================================== -->
-
+  <!-- MENÚ -->
   <div id="menu-contenedor"></div>
 
+  <!-- CONTENIDO -->
+  <main class="container">
 
-  <!-- =====================================================
-       CONTENIDO
-  ====================================================== -->
+    <header class="page-head">
+      <span class="eyebrow reveal">Diario visual · Portafolio</span>
 
-  <main
-    class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 md:px-12 md:py-16 relative z-10"
-  >
-
-    <header
-      class="mb-14 pb-8 border-b border-white/[0.08]"
-    >
-
-      <div class="flex items-center gap-3 mb-3">
-
-        <span class="inline-block w-6 h-[1px] bg-white/40"></span>
-
-        <span
-          class="text-[10px] uppercase tracking-[0.4em] text-zinc-400 font-mono"
-        >
-          Diario Visual • Portafolio
-        </span>
-
-      </div>
-
-
-      <h1
-        class="text-4xl md:text-5xl font-serif text-white mb-4 leading-tight font-light"
-      >
-
-        Arquitectura, retratos y
-
-        <span class="italic">
-          atmósferas visuales.
-        </span>
-
+      <h1 class="display reveal reveal--d1">
+        Arquitectura, retratos y <em>atmósferas visuales.</em>
       </h1>
 
-
-      <p
-        class="text-sm text-zinc-400 font-light max-w-2xl leading-relaxed"
-      >
-
+      <p class="lead reveal reveal--d2">
         Una colección fotográfica pura basada en la luz natural,
         los contrastes honestos y la estética documental.
-
       </p>
 
-
-      <!-- =================================================
-           FILTROS
-      ================================================== -->
-
-      <div
-        id="filter-buttons"
-        class="mt-8 flex flex-wrap gap-3"
-      >
-
-        <button
-          onclick="filterPosts('Todas')"
-          data-category="Todas"
-          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white border-b border-white"
-        >
-          Todas
-        </button>
-
-
-        <button
-          onclick="filterPosts('Arquitectura')"
-          data-category="Arquitectura"
-          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white/40 hover:text-white"
-        >
-          Arquitectura
-        </button>
-
-
-        <button
-          onclick="filterPosts('Retratos')"
-          data-category="Retratos"
-          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white/40 hover:text-white"
-        >
-          Retratos
-        </button>
-
-
-        <button
-          onclick="filterPosts('Estilo de vida')"
-          data-category="Estilo de vida"
-          class="filter-btn text-[10px] uppercase tracking-[0.2em] px-4 py-2 font-medium text-white/40 hover:text-white"
-        >
-          Estilo de vida
-        </button>
-
+      <!-- FILTROS -->
+      <div id="filter-buttons" class="chips chips--scroll mt-4 reveal reveal--d3" role="group" aria-label="Filtrar por categoría">
+        <button onclick="filterPosts('Todas')"          data-category="Todas"          class="chip filter-btn" aria-pressed="true">Todas</button>
+        <button onclick="filterPosts('Arquitectura')"   data-category="Arquitectura"   class="chip filter-btn" aria-pressed="false">Arquitectura</button>
+        <button onclick="filterPosts('Retratos')"       data-category="Retratos"       class="chip filter-btn" aria-pressed="false">Retratos</button>
+        <button onclick="filterPosts('Estilo de vida')" data-category="Estilo de vida" class="chip filter-btn" aria-pressed="false">Estilo de vida</button>
       </div>
-
     </header>
 
-
-    <!-- =====================================================
-         LOADING
-    ====================================================== -->
-
-    <div
-      id="loading-indicator"
-      class="text-center py-20 text-xs text-white/50 tracking-widest uppercase font-mono"
-    >
-      Sincronizando galería...
+    <!-- LOADING -->
+    <div id="loading-indicator" class="masonry" aria-label="Cargando galería">
+      <div class="skeleton" style="height:420px"></div>
+      <div class="skeleton" style="height:300px"></div>
+      <div class="skeleton" style="height:360px"></div>
+      <div class="skeleton" style="height:280px"></div>
+      <div class="skeleton" style="height:400px"></div>
+      <div class="skeleton" style="height:320px"></div>
     </div>
 
-
-    <!-- =====================================================
-         ERROR
-    ====================================================== -->
-
-    <div
-      id="error-message"
-      class="hidden text-center py-20 text-red-400 text-xs font-mono"
-    >
-
+    <!-- ERROR -->
+    <div id="error-message" class="state state--error" hidden>
       <span id="error-text"></span>
-
     </div>
 
-
-    <!-- =====================================================
-         GALERÍA
-    ====================================================== -->
-
-    <div
-      id="gallery-container"
-      class="masonry-grid relative pb-16"
-    ></div>
+    <!-- GALERÍA -->
+    <div id="gallery-container" class="masonry" aria-live="polite"></div>
 
   </main>
 
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand">
+        <a href="/index.html" class="brand" aria-label="Inicio">
+          <img src="/logo.svg" alt="" width="26" height="26">
+          <span class="brand__name">Nicolás Fotografía</span>
+        </a>
+        <p>Mar del Plata · Buenos Aires · Coberturas nacionales e internacionales.</p>
+      </div>
+      <nav class="site-footer__links" aria-label="Redes">
+        <a href="https://www.instagram.com/nicolas_calderon_fotografia" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://wa.me/5492236666629" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a href="mailto:nicolascalderonfotografia@gmail.com">Email</a>
+        <span>© 2026</span>
+      </nav>
+    </div>
+  </footer>
 
-  <!-- =====================================================
-       LIGHTBOX
-  ====================================================== -->
-
-  <div
-    id="lightbox"
-    class="hidden fixed inset-0 z-50 bg-[#030305]/95 backdrop-blur-xl flex-col items-center justify-center p-6"
-  >
-
-    <button
-      onclick="closeLightbox()"
-      aria-label="Cerrar"
-      class="absolute top-8 right-8 text-white/70 hover:text-white p-2"
-    >
-
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-
-        <line
-          x1="18"
-          y1="6"
-          x2="6"
-          y2="18"
-        ></line>
-
-        <line
-          x1="6"
-          y1="6"
-          x2="18"
-          y2="18"
-        ></line>
-
-      </svg>
-
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Fotografía ampliada">
+    <button onclick="closeLightbox()" aria-label="Cerrar" class="icon-btn lightbox__close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
 
+    <div id="lightbox-media-container" class="lightbox__media"></div>
 
-    <div
-      id="lightbox-media-container"
-      class="w-full max-w-5xl flex justify-center mt-8"
-    ></div>
-
-
-    <div
-      class="mt-6 text-center max-w-2xl w-full"
-    >
-
-      <p
-        id="lightbox-caption"
-        class="text-sm text-zinc-300 font-light mb-4"
-      ></p>
-
-
-      <a
-        id="lightbox-link"
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest text-white border-b border-white/30 hover:border-white transition-all pb-1"
-      >
+    <div class="lightbox__meta">
+      <p id="lightbox-caption" class="lightbox__caption"></p>
+      <div class="row" style="justify-content:center">
+      <a id="lightbox-buy" href="/tienda.html" class="btn btn--primary btn--sm">
+        Ver la tienda
+        <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a id="lightbox-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--sm">
         Ver en Instagram
       </a>
-
+      </div>
     </div>
-
   </div>
-
-
-  <!-- =====================================================
-       MENÚ EXTERNO
-  ====================================================== -->
 
   <script src="/fetch-menu.js"></script>
 
-
-  <!-- =====================================================
-       GALERÍA
-  ====================================================== -->
-
+  <!-- GALERÍA -->
   <script>
-
-    /*
-     * =====================================================
-     * CONFIGURACIÓN
-     * =====================================================
-     */
-
     const IG_API_URL =
       'https://script.google.com/macros/s/AKfycbxBM4NG4tD2KjWuDO76ml20Ln96aKPKBYJBFT4ToKNwYNRQVuEVbniImYW_9GcSuaXA2Q/exec';
 
-
     const POSTS_PER_BATCH = 9;
 
-
     let allPosts = [];
-
     let currentPosts = [];
-
     let renderedCount = 0;
-
     let loadMoreObserver = null;
 
-
-    /*
-     * =====================================================
-     * CARGAR GALERÍA
-     *
-     * Usamos JSONP en lugar de fetch().
-     *
-     * Esto evita el problema de CORS de Google Apps Script.
-     * =====================================================
-     */
-
+    /* ---------- Cargar (JSONP para evitar CORS de Apps Script) ---------- */
     function loadGallery() {
+      const loading   = document.getElementById('loading-indicator');
+      const errorBox  = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+      const callbackName = '__instagramGallery_' + Date.now();
+      const script = document.createElement('script');
 
-      const loading =
-        document.getElementById(
-          'loading-indicator'
-        );
+      function cleanup() {
+        try { delete window[callbackName]; script.remove(); } catch (e) {}
+      }
+      function fail(msg) {
+        loading.style.display = 'none';
+        errorText.textContent = msg;
+        errorBox.hidden = false;
+      }
 
-      const errorBox =
-        document.getElementById(
-          'error-message'
-        );
+      window[callbackName] = function (data) {
+        try {
+          if (!Array.isArray(data)) throw new Error('La API no devolvió una lista de fotografías.');
+          allPosts = data;
+          loading.style.display = 'none';
+          errorBox.hidden = true;
+          renderPosts(allPosts, true);
+        } catch (error) {
+          fail('No se pudo cargar la galería: ' + error.message);
+        }
+        cleanup();
+      };
 
-      const errorText =
-        document.getElementById(
-          'error-text'
-        );
-
-
-      const callbackName =
-        '__instagramGallery_' +
-        Date.now();
-
-
-      window[callbackName] =
-        function(data) {
-
-          try {
-
-            if (!Array.isArray(data)) {
-
-              throw new Error(
-                'La API no devolvió una lista de fotografías.'
-              );
-
-            }
-
-
-            allPosts = data;
-
-
-            loading.style.display =
-              'none';
-
-
-            errorBox.classList.add(
-              'hidden'
-            );
-
-
-            renderPosts(
-              allPosts,
-              true
-            );
-
-
-          } catch (error) {
-
-            loading.style.display =
-              'none';
-
-            errorText.textContent =
-              'No se pudo cargar la galería: ' +
-              error.message;
-
-            errorBox.classList.remove(
-              'hidden'
-            );
-
-          }
-
-
-          /*
-           * Limpiamos el callback después de usarlo.
-           */
-
-          try {
-
-            delete window[callbackName];
-
-            script.remove();
-
-          } catch (cleanupError) {
-
-            /* No hacemos nada */
-
-          }
-
-        };
-
-
-      /*
-       * Creamos un <script>.
-       *
-       * A diferencia de fetch(),
-       * los scripts externos no tienen el mismo
-       * problema de CORS.
-       */
-
-      const script =
-        document.createElement('script');
-
-
-      script.src =
-        IG_API_URL +
-        '?callback=' +
-        encodeURIComponent(callbackName) +
-        '&_=' +
-        Date.now();
-
-
+      script.src = IG_API_URL + '?callback=' + encodeURIComponent(callbackName) + '&_=' + Date.now();
       script.async = true;
-
-
-      script.onerror =
-        function() {
-
-          try {
-
-            delete window[callbackName];
-
-            script.remove();
-
-          } catch (cleanupError) {
-
-            /* No hacemos nada */
-
-          }
-
-
-          loading.style.display =
-            'none';
-
-
-          errorText.textContent =
-            'No se pudo conectar con Google Apps Script.';
-
-          errorBox.classList.remove(
-            'hidden'
-          );
-
-        };
-
-
-      document.head.appendChild(
-        script
-      );
-
+      script.onerror = function () {
+        cleanup();
+        fail('No se pudo conectar con Google Apps Script.');
+      };
+      document.head.appendChild(script);
     }
 
-
-    /*
-     * =====================================================
-     * RENDERIZAR GALERÍA POR TANDAS
-     * =====================================================
-     */
-
-    function renderPosts(
-      posts,
-      reset = true
-    ) {
-
-      const container =
-        document.getElementById(
-          'gallery-container'
-        );
-
+    /* ---------- Renderizar por tandas ---------- */
+    function renderPosts(posts, reset = true) {
+      const container = document.getElementById('gallery-container');
 
       if (reset) {
+        container.innerHTML = '';
+        currentPosts = posts;
+        renderedCount = 0;
+        if (loadMoreObserver) { loadMoreObserver.disconnect(); loadMoreObserver = null; }
+        const oldTrigger = document.getElementById('load-more-trigger');
+        if (oldTrigger) oldTrigger.remove();
+      }
 
-        container.innerHTML =
-          '';
+      if (currentPosts.length === 0) {
+        container.innerHTML = '<div class="state masonry__full">No hay publicaciones en esta categoría.</div>';
+        return;
+      }
 
-        currentPosts =
-          posts;
+      const nextPosts = currentPosts.slice(renderedCount, renderedCount + POSTS_PER_BATCH);
 
-        renderedCount =
-          0;
+      nextPosts.forEach(function (post, localIndex) {
+        const index  = renderedCount + localIndex;
+        const imgUrl = post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url;
 
+        const item = document.createElement('figure');
+        item.className = 'tile';
+        item.tabIndex = 0;
+        item.setAttribute('role', 'button');
+        item.setAttribute('aria-label', 'Ampliar fotografía');
+        item.style.animationDelay = (localIndex * 60) + 'ms';
+        item.onclick = function () { openLightbox(post); };
+        item.onkeydown = function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(post); }
+        };
 
-        if (loadMoreObserver) {
+        const img = document.createElement('img');
+        img.src = imgUrl;
+        img.alt = post.caption ? post.caption.substring(0, 80) : 'Fotografía de Nicolás';
+        img.loading = index < 2 ? 'eager' : 'lazy';
+        img.fetchPriority = index < 2 ? 'high' : 'low';
+        img.decoding = 'async';
+        img.draggable = false;
+        img.className = 'tile__img';
+        img.onerror = function () { item.style.display = 'none'; };
+        item.appendChild(img);
 
+        if (post.caption) {
+          const overlay = document.createElement('figcaption');
+          overlay.className = 'tile__overlay';
+          const caption = document.createElement('span');
+          caption.className = 'tile__caption';
+          caption.textContent = post.caption;
+          overlay.appendChild(caption);
+          item.appendChild(overlay);
+        }
+
+        container.appendChild(item);
+      });
+
+      renderedCount += nextPosts.length;
+
+      if (renderedCount < currentPosts.length) createLoadMoreTrigger(container);
+    }
+
+    /* ---------- Scroll infinito ---------- */
+    function createLoadMoreTrigger(container) {
+      const oldTrigger = document.getElementById('load-more-trigger');
+      if (oldTrigger) oldTrigger.remove();
+
+      const trigger = document.createElement('div');
+      trigger.id = 'load-more-trigger';
+      trigger.style.height = '1px';
+      trigger.style.width = '100%';
+      container.appendChild(trigger);
+
+      loadMoreObserver = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) {
           loadMoreObserver.disconnect();
-
-          loadMoreObserver =
-            null;
-
+          loadMoreObserver = null;
+          renderPosts(currentPosts, false);
         }
+      }, { rootMargin: '1000px 0px' });
 
-
-        const oldTrigger =
-          document.getElementById(
-            'load-more-trigger'
-          );
-
-
-        if (oldTrigger) {
-
-          oldTrigger.remove();
-
-        }
-
-      }
-
-
-      /*
-       * ===================================================
-       * SIN PUBLICACIONES
-       * ===================================================
-       */
-
-      if (
-        currentPosts.length === 0
-      ) {
-
-        container.innerHTML = `
-
-          <div
-            class="text-center text-xs text-zinc-500 font-mono py-20"
-          >
-            No hay publicaciones disponibles.
-          </div>
-
-        `;
-
-        return;
-
-      }
-
-
-      /*
-       * ===================================================
-       * SIGUIENTE TANDA
-       * ===================================================
-       */
-
-      const nextPosts =
-        currentPosts.slice(
-          renderedCount,
-          renderedCount + POSTS_PER_BATCH
-        );
-
-
-      nextPosts.forEach(
-        function(post, localIndex) {
-
-          const index =
-            renderedCount +
-            localIndex;
-
-
-          /*
-           * URL DE LA FOTO
-           */
-
-          const imgUrl =
-            post.media_type === 'VIDEO'
-              ? post.thumbnail_url
-              : post.media_url;
-
-
-          /*
-           * CONTENEDOR
-           */
-
-          const item =
-            document.createElement(
-              'div'
-            );
-
-
-          item.className =
-            'masonry-item relative group cursor-pointer overflow-hidden bg-[#08080a] border border-white/[0.08] rounded-sm';
-
-
-          item.onclick =
-            function() {
-
-              openLightbox(post);
-
-            };
-
-
-          /*
-           * IMAGEN
-           */
-
-          const img =
-            document.createElement(
-              'img'
-            );
-
-
-          img.src =
-            imgUrl;
-
-
-          img.alt =
-            post.caption
-              ? post.caption.substring(
-                  0,
-                  80
-                )
-              : 'Fotografía de Nicolás';
-
-
-          /*
-           * LAS PRIMERAS DOS:
-
-           * carga inmediata
-           * prioridad alta
-           */
-
-          if (index < 2) {
-
-            img.loading =
-              'eager';
-
-            img.fetchPriority =
-              'high';
-
-          } else {
-
-            img.loading =
-              'lazy';
-
-            img.fetchPriority =
-              'low';
-
-          }
-
-
-          img.decoding =
-            'async';
-
-
-          img.draggable =
-            false;
-
-
-          img.className =
-            'gallery-image';
-
-
-          /*
-           * Si una imagen falla,
-           * simplemente ocultamos el elemento.
-           */
-
-          img.onerror =
-            function() {
-
-              item.style.display =
-                'none';
-
-            };
-
-
-          /*
-           * OVERLAY
-           */
-
-          const overlay =
-            document.createElement(
-              'div'
-            );
-
-
-          overlay.className =
-            'absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none';
-
-
-          /*
-           * CAPTION
-           */
-
-          if (post.caption) {
-
-            const caption =
-              document.createElement(
-                'div'
-              );
-
-
-            caption.className =
-              'absolute bottom-0 left-0 right-0 p-5 text-xs text-white/90 font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none';
-
-
-            caption.textContent =
-              post.caption;
-
-
-            item.appendChild(
-              caption
-            );
-
-          }
-
-
-          item.appendChild(
-            img
-          );
-
-
-          item.appendChild(
-            overlay
-          );
-
-
-          container.appendChild(
-            item
-          );
-
-        }
-      );
-
-
-      /*
-       * Actualizamos cantidad renderizada.
-       */
-
-      renderedCount +=
-        nextPosts.length;
-
-
-      /*
-       * ===================================================
-       * ¿QUEDAN MÁS FOTOS?
-       * ===================================================
-       */
-
-      if (
-        renderedCount <
-        currentPosts.length
-      ) {
-
-        createLoadMoreTrigger(
-          container
-        );
-
-      }
-
+      loadMoreObserver.observe(trigger);
     }
 
+    /* ---------- Filtros ---------- */
+    function filterPosts(category) {
+      document.querySelectorAll('.filter-btn').forEach(function (button) {
+        button.setAttribute('aria-pressed', String(button.dataset.category === category));
+      });
 
-    /*
-     * =====================================================
-     * TRIGGER DE CARGA
-     * =====================================================
-     */
+      if (category === 'Todas') { renderPosts(allPosts, true); return; }
 
-    function createLoadMoreTrigger(
-      container
-    ) {
-
-      const oldTrigger =
-        document.getElementById(
-          'load-more-trigger'
-        );
-
-
-      if (oldTrigger) {
-
-        oldTrigger.remove();
-
-      }
-
-
-      const trigger =
-        document.createElement(
-          'div'
-        );
-
-
-      trigger.id =
-        'load-more-trigger';
-
-
-      trigger.style.height =
-        '1px';
-
-
-      trigger.style.width =
-        '100%';
-
-
-      container.appendChild(
-        trigger
-      );
-
-
-      loadMoreObserver =
-        new IntersectionObserver(
-          function(entries) {
-
-            if (
-              entries[0].isIntersecting
-            ) {
-
-              loadMoreObserver.disconnect();
-
-              loadMoreObserver =
-                null;
-
-              renderPosts(
-                currentPosts,
-                false
-              );
-
-            }
-
-          },
-          {
-            rootMargin:
-              '1000px 0px'
-          }
-        );
-
-
-      loadMoreObserver.observe(
-        trigger
-      );
-
+      const filtered = allPosts.filter(function (post) {
+        return (post.caption || '').toLowerCase().includes(category.toLowerCase());
+      });
+      renderPosts(filtered, true);
     }
 
+    /* ---------- Lightbox ---------- */
+    let lastFocus = null;
 
-    /*
-     * =====================================================
-     * FILTROS
-     * =====================================================
-     */
+    function openLightbox(post) {
+      const lightbox = document.getElementById('lightbox');
+      const media    = document.getElementById('lightbox-media-container');
+      const imgUrl   = post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url;
 
-    function filterPosts(
-      category
-    ) {
+      media.innerHTML = '';
+      const image = document.createElement('img');
+      image.id = 'lightbox-image';
+      image.src = imgUrl;
+      image.alt = post.caption ? post.caption.substring(0, 100) : 'Fotografía';
+      image.decoding = 'async';
+      media.appendChild(image);
 
-      /*
-       * Actualizamos botones.
-       */
+      document.getElementById('lightbox-caption').textContent = post.caption || '';
+      document.getElementById('lightbox-link').href = post.permalink || '#';
 
-      document
-        .querySelectorAll(
-          '.filter-btn'
-        )
-        .forEach(
-          function(button) {
-
-            const active =
-              button.dataset.category ===
-              category;
-
-
-            if (active) {
-
-              button.classList.add(
-                'text-white',
-                'border-b',
-                'border-white'
-              );
-
-              button.classList.remove(
-                'text-white/40'
-              );
-
-            } else {
-
-              button.classList.remove(
-                'text-white',
-                'border-b',
-                'border-white'
-              );
-
-              button.classList.add(
-                'text-white/40'
-              );
-
-            }
-
-          }
-        );
-
-
-      /*
-       * Todas
-       */
-
-      if (
-        category === 'Todas'
-      ) {
-
-        renderPosts(
-          allPosts,
-          true
-        );
-
-        return;
-
-      }
-
-
-      /*
-       * Filtramos por caption.
-       */
-
-      const filtered =
-        allPosts.filter(
-          function(post) {
-
-            const caption =
-              (
-                post.caption ||
-                ''
-              ).toLowerCase();
-
-
-            return caption.includes(
-              category.toLowerCase()
-            );
-
-          }
-        );
-
-
-      renderPosts(
-        filtered,
-        true
-      );
-
+      lastFocus = document.activeElement;
+      lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      lightbox.querySelector('.lightbox__close').focus();
     }
-
-
-    /*
-     * =====================================================
-     * LIGHTBOX
-     * =====================================================
-     */
-
-    function openLightbox(
-      post
-    ) {
-
-      const lightbox =
-        document.getElementById(
-          'lightbox'
-        );
-
-
-      const mediaContainer =
-        document.getElementById(
-          'lightbox-media-container'
-        );
-
-
-      const captionEl =
-        document.getElementById(
-          'lightbox-caption'
-        );
-
-
-      const linkEl =
-        document.getElementById(
-          'lightbox-link'
-        );
-
-
-      const imgUrl =
-        post.media_type === 'VIDEO'
-          ? post.thumbnail_url
-          : post.media_url;
-
-
-      mediaContainer.innerHTML =
-        '';
-
-
-      const image =
-        document.createElement(
-          'img'
-        );
-
-
-      image.id =
-        'lightbox-image';
-
-
-      image.src =
-        imgUrl;
-
-
-      image.alt =
-        post.caption
-          ? post.caption.substring(
-              0,
-              100
-            )
-          : 'Fotografía';
-
-
-      image.decoding =
-        'async';
-
-
-      mediaContainer.appendChild(
-        image
-      );
-
-
-      captionEl.textContent =
-        post.caption ||
-        'Sin descripción';
-
-
-      linkEl.href =
-        post.permalink ||
-        '#';
-
-
-      lightbox.classList.remove(
-        'hidden'
-      );
-
-
-      lightbox.classList.add(
-        'flex'
-      );
-
-    }
-
-
-    /*
-     * =====================================================
-     * CERRAR LIGHTBOX
-     * =====================================================
-     */
 
     function closeLightbox() {
-
-      const lightbox =
-        document.getElementById(
-          'lightbox'
-        );
-
-
-      lightbox.classList.add(
-        'hidden'
-      );
-
-
-      lightbox.classList.remove(
-        'flex'
-      );
-
-
-      document.getElementById(
-        'lightbox-media-container'
-      ).innerHTML =
-        '';
-
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox.classList.contains('is-open')) return;
+      lightbox.classList.remove('is-open');
+      document.body.style.overflow = '';
+      setTimeout(function () { document.getElementById('lightbox-media-container').innerHTML = ''; }, 250);
+      if (lastFocus) lastFocus.focus();
     }
 
+    // Cerrar con clic fuera de la foto
+    document.getElementById('lightbox').addEventListener('click', function (e) {
+      if (e.target === this || e.target.id === 'lightbox-media-container') closeLightbox();
+    });
 
-    /*
-     * =====================================================
-     * TECLA ESC
-     * =====================================================
-     */
-
-    document.addEventListener(
-      'keydown',
-      function(event) {
-
-        if (
-          event.key === 'Escape'
-        ) {
-
-          closeLightbox();
-
-        }
-
-      }
-    );
-
-
-    /*
-     * =====================================================
-     * INICIAR
-     * =====================================================
-     */
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeLightbox();
+    });
 
     loadGallery();
-
-
   </script>
 
-
-  <!-- =====================================================
-       BLOQUEAR CLIC DERECHO
-  ====================================================== -->
-
+  <!-- Bloquear clic derecho -->
   <script>
-
-    document.addEventListener(
-      'contextmenu',
-      function(event) {
-
-        event.preventDefault();
-
-      }
-    );
-
+    document.addEventListener('contextmenu', function (event) { event.preventDefault(); });
   </script>
 
-
-  <!-- =====================================================
-       SENTRY
-       Se carga DESPUÉS de que todo lo demás está listo.
-  ====================================================== -->
-
+  <!-- Sentry (se carga después de todo) -->
   <script>
-
-    window.addEventListener(
-      'load',
-      function() {
-
-        const script =
-          document.createElement(
-            'script'
-          );
-
-
-        script.src =
-          'https://browser.sentry-cdn.com/7.100.0/bundle.min.js';
-
-
-        script.crossOrigin =
-          'anonymous';
-
-
-        script.onload =
-          function() {
-
-            if (
-              typeof Sentry !==
-              'undefined'
-            ) {
-
-              Sentry.init({
-
-                dsn:
-                  'https://aa1a112752bd8b5e25dfec3fd75b0eb8@o4512092368142336.ingest.us.sentry.io/4512096924860416',
-
-                environment:
-                  'production',
-
-                tracesSampleRate:
-                  0.1
-
-              });
-
-            }
-
-          };
-
-
-        document.head.appendChild(
-          script
-        );
-
-      }
-    );
-
+    window.addEventListener('load', function () {
+      const script = document.createElement('script');
+      script.src = 'https://browser.sentry-cdn.com/7.100.0/bundle.min.js';
+      script.crossOrigin = 'anonymous';
+      script.onload = function () {
+        if (typeof Sentry !== 'undefined') {
+          Sentry.init({
+            dsn: 'https://aa1a112752bd8b5e25dfec3fd75b0eb8@o4512092368142336.ingest.us.sentry.io/4512096924860416',
+            environment: 'production',
+            tracesSampleRate: 0.1
+          });
+        }
+      };
+      document.head.appendChild(script);
+    });
   </script>
-
 </body>
-
 </html>

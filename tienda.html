@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nicolás Fotografía - Tienda de fotografías: archivos digitales, impresiones y cuadros con marco. Mar del Plata, Argentina.">
+  <meta name="theme-color" content="#0C0C0D">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <title>Nicolás Fotografía — Tienda</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+
+  <script src="https://js.sentry-cdn.com/aa1a112752bd8b5e25dfec3fd75b0eb8.min.js" crossorigin="anonymous"></script>
+</head>
+
+<body style="padding-bottom: 5rem">
+  <div class="grain" aria-hidden="true"></div>
+  <div id="menu-contenedor"></div>
+
+  <main class="container">
+
+    <!-- Cabecera -->
+    <header class="page-head page-head--split">
+      <div style="display:grid; gap: var(--space-5)">
+        <span class="eyebrow reveal">Tienda · Prints & digitales</span>
+        <h1 class="display reveal reveal--d1">Llevate una <em>fotografía.</em></h1>
+        <p class="lead reveal reveal--d2">
+          Cada imagen está disponible como archivo digital, impresión o cuadro con marco listo para colgar.
+          Elegí la foto, el formato y el tamaño.
+        </p>
+      </div>
+
+      <div id="shop-filters-wrap" class="reveal reveal--d3" style="display:grid; gap: var(--space-3); min-width:0" hidden>
+        <span class="label">Categoría</span>
+        <div id="shop-filters" class="chips chips--scroll" role="group" aria-label="Filtrar por categoría">
+          <button class="chip" data-category="Todas" aria-pressed="true">Todas</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Productos -->
+    <div id="shop-grid" class="shop-grid" aria-live="polite"></div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <div class="site-footer__brand">
+        <a href="/index.html" class="brand" aria-label="Inicio">
+          <img src="/logo.svg" alt="" width="26" height="26">
+          <span class="brand__name">Nicolás Fotografía</span>
+        </a>
+        <p>Impresiones y archivos digitales. Envíos a todo el país desde Mar del Plata.</p>
+      </div>
+      <nav class="site-footer__links" aria-label="Contacto">
+        <a href="https://wa.me/5492236666629" target="_blank" rel="noopener noreferrer">Consultas por WhatsApp</a>
+        <a href="mailto:nicolascalderonfotografia@gmail.com">Email</a>
+        <span>© 2026</span>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Botón carrito -->
+  <button id="cart-fab" class="cart-fab" aria-label="Abrir carrito" aria-controls="cart">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+    <span>Carrito</span>
+    <span id="cart-count" class="cart-fab__count">0</span>
+  </button>
+
+  <div id="scrim" class="scrim"></div>
+
+  <!-- Modal de producto -->
+  <div id="pmodal" class="pmodal" role="dialog" aria-modal="true" aria-labelledby="pm-title">
+    <div class="pmodal__dialog">
+      <button id="pm-close" class="icon-btn pmodal__close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="pmodal__media wm"><img id="pm-img" alt="" draggable="false"></div>
+
+      <form id="pm-form" class="pmodal__body">
+        <div style="display:grid; gap: var(--space-2)">
+          <span class="label" id="pm-cat">Fotografía</span>
+          <h2 id="pm-title" class="h3">—</h2>
+          <p id="pm-desc" class="muted" style="font-size: var(--fs-small)" hidden></p>
+        </div>
+
+        <fieldset class="option-group">
+          <legend class="label">Formato</legend>
+          <div id="pm-formats" class="stack"></div>
+        </fieldset>
+
+        <fieldset class="option-group" id="pm-size-group">
+          <legend class="label">Tamaño</legend>
+          <div id="pm-sizes" class="row"></div>
+        </fieldset>
+
+        <fieldset class="option-group" id="pm-color-group">
+          <legend class="label">Color del marco</legend>
+          <div id="pm-colors" class="row" style="gap: var(--space-5)"></div>
+        </fieldset>
+
+        <div style="display:grid; gap: var(--space-4); padding-top: var(--space-5); border-top: 1px solid var(--line)">
+          <div class="cart__total">
+            <span class="muted" style="font-size: var(--fs-small)">Precio</span>
+            <span id="pm-price" class="price-big">$0</span>
+          </div>
+          <div class="buy-row">
+            <div class="qty" aria-label="Cantidad">
+              <button type="button" id="pm-minus" aria-label="Restar">−</button>
+              <output id="pm-qty">1</output>
+              <button type="button" id="pm-plus" aria-label="Sumar">+</button>
+            </div>
+            <button type="submit" class="btn btn--primary">
+              Agregar al carrito
+              <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <ul id="pm-notes" class="note-list"></ul>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel carrito -->
+  <aside id="cart" class="cart" aria-label="Carrito" aria-hidden="true">
+    <div class="cart__head">
+      <h2 class="h3">Tu <em>carrito</em></h2>
+      <button id="cart-close" class="icon-btn" aria-label="Cerrar carrito">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <ul id="cart-items" class="cart__items"></ul>
+
+    <div id="cart-foot" class="cart__foot">
+      <div class="cart__total">
+        <span>Total</span>
+        <span id="cart-total" class="price-big">$0</span>
+      </div>
+      <div class="cart__fields">
+        <input id="co-name"  class="input" type="text"  placeholder="Nombre y apellido" autocomplete="name">
+        <input id="co-email" class="input" type="email" placeholder="Email" autocomplete="email">
+      </div>
+      <div class="cart__actions">
+        <button id="co-email-btn" class="btn btn--ghost">Pedir por email</button>
+        <button id="co-wa-btn" class="btn btn--primary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+      <p class="field__hint">Te confirmo disponibilidad, envío y forma de pago antes de cobrar.</p>
+    </div>
+  </aside>
+
+  <!-- Toast -->
+  <div id="toast-feedback" class="toast" role="status" aria-live="polite">
+    <div id="toast-icon"></div>
+    <p id="toast-text"></p>
+  </div>
+
+  <script src="/fetch-menu.js"></script>
+
+  <script>
+  /* =========================================================
+     CONFIGURACIÓN DE LA TIENDA — editá precios y textos acá
+     ========================================================= */
+  const CONFIG = {
+    // URL de la implementación del Apps Script de la tienda (tienda-apps-script.gs)
+    TIENDA_API_URL: 'https://script.google.com/macros/s/AKfycbzMnSw7q8h7nLTn54FCn0rIFxcFDBSq6pMetpQoijQpzLwN0nJQIH5UoaTYrBNwaYVd/exec',
+    FORMSPREE: 'https://formspree.io/f/xwlkwdye',
+    WHATSAPP: '5492236666629',
+    MONEDA: 'ARS',
+
+    FORMATOS: {
+      digital: {
+        nombre: 'Digital',
+        desc: 'Archivo JPG en alta resolución, sin marca de agua. Uso personal.',
+        tamanos: { 'Alta resolución': 17000 },
+        notas: ['Entrega por email', 'Sin costo de envío']
+      },
+      impresa: {
+        nombre: 'Impresa',
+        desc: 'Impresión profesional en papel fotográfico premium, lista para enmarcar.',
+        tamanos: { '20 × 30 cm': 28500, '30 × 45 cm': 45500, '40 × 60 cm': 68000 },
+        notas: ['Envíos a todo el país o retiro en Mar del Plata', 'Embalaje rígido protegido']
+      },
+      marco: {
+        nombre: 'Impresa con marco',
+        desc: 'Impresión profesional con marco de madera y vidrio, lista para colgar.',
+        tamanos: { '20 × 30 cm': 51000, '30 × 45 cm': 79500, '40 × 60 cm': 113500 },
+        colores: [
+          { nombre: 'Negro',         hex: '#151515' },
+          { nombre: 'Blanco',        hex: '#EDEBE6' },
+          { nombre: 'Madera natural', hex: '#B38A5E' }
+        ],
+        notas: ['Envíos a todo el país o retiro en Mar del Plata', 'Incluye gancho para colgar']
+      }
+    }
+  };
+
+  /* ========================================================= */
+
+  const CART_KEY = 'ncf_carrito_v2';
+  const money = new Intl.NumberFormat('es-AR', { style: 'currency', currency: CONFIG.MONEDA, maximumFractionDigits: 0 });
+  const $ = (id) => document.getElementById(id);
+  const ICON_OK  = '<svg viewBox="0 0 24 24" fill="none" stroke="#8FD3A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+  const ICON_ERR = '<svg viewBox="0 0 24 24" fill="none" stroke="#F2A0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6l12 12"/></svg>';
+  const ICON_DOT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+
+  let products = [];
+  let cart = loadCart();
+  let current = null;           // producto abierto
+  let sel = {};                 // { formato, tamano, color, qty }
+  let lastFocus = null;
+
+  /* ---------- Utilidades ---------- */
+  function minPrice() {
+    return Math.min(...Object.values(CONFIG.FORMATOS).flatMap(f => Object.values(f.tamanos)));
+  }
+  let toastTimer;
+  function toast(msg, ok = true) {
+    $('toast-text').textContent = msg;
+    $('toast-icon').innerHTML = ok ? ICON_OK : ICON_ERR;
+    $('toast-feedback').classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $('toast-feedback').classList.remove('is-visible'), 3500);
+  }
+  function lockScroll(on) { document.body.style.overflow = on ? 'hidden' : ''; }
+
+  /* ---------- Cargar fotos desde la carpeta de Drive ---------- */
+  function loadProducts() {
+    const grid = $('shop-grid');
+
+    if (!/^https:\/\/script\.google\.com\//.test(CONFIG.TIENDA_API_URL)) {
+      grid.innerHTML = '<div class="state">Falta configurar la carpeta de Drive de la tienda (TIENDA_API_URL).</div>';
+      return;
+    }
+
+    grid.innerHTML = Array.from({ length: 8 }, () =>
+      '<div style="display:grid;gap:12px"><div class="skeleton" style="aspect-ratio:4/5"></div><div class="skeleton" style="height:14px;width:70%"></div></div>'
+    ).join('');
+
+    const cb = '__shop_' + Date.now();
+    const script = document.createElement('script');
+    const cleanup = () => { try { delete window[cb]; script.remove(); } catch (e) {} };
+
+    window[cb] = function (data) {
+      cleanup();
+      if (!Array.isArray(data)) { grid.innerHTML = '<div class="state state--error">No se pudo cargar la tienda.</div>'; return; }
+
+      products = data
+        .filter(p => p && p.id && p.imagen)
+        .map(p => ({
+          id: String(p.id),
+          img: p.imagen,
+          titulo: p.titulo || 'Fotografía',
+          descripcion: p.descripcion || '',
+          categoria: p.categoria || '',
+          link: 'https://drive.google.com/file/d/' + p.id + '/view'
+        }));
+
+      buildFilters();
+      renderGrid(products);
+      pruneCart();
+      openFromURL();
+    };
+
+    script.src = CONFIG.TIENDA_API_URL + '?callback=' + encodeURIComponent(cb) + '&_=' + Date.now();
+    script.async = true;
+    script.onerror = () => { cleanup(); grid.innerHTML = '<div class="state state--error">No se pudo conectar con la tienda. Intentá de nuevo en unos minutos.</div>'; };
+    document.head.appendChild(script);
+  }
+
+  /* ---------- Filtros (salen de las subcarpetas de Drive) ---------- */
+  function buildFilters() {
+    const cats = [...new Set(products.map(p => p.categoria).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+    const wrap = $('shop-filters-wrap');
+    wrap.hidden = cats.length < 2;
+    $('shop-filters').innerHTML = ['Todas', ...cats].map((c, i) =>
+      `<button class="chip" data-category="${c.replace(/"/g, '&quot;')}" aria-pressed="${i === 0}"></button>`
+    ).join('');
+    $('shop-filters').querySelectorAll('.chip').forEach(b => { b.textContent = b.dataset.category; });
+  }
+
+  /* ---------- Si una foto se vendió, se saca del carrito ---------- */
+  function pruneCart() {
+    const ids = new Set(products.map(p => p.id));
+    const before = cart.length;
+    cart = cart.filter(i => ids.has(i.id));
+    if (cart.length !== before) {
+      saveCart();
+      toast('Una foto de tu carrito ya no está disponible y se quitó.', false);
+    }
+  }
+
+  /* ---------- Grilla ---------- */
+  function renderGrid(list) {
+    const grid = $('shop-grid');
+    grid.innerHTML = '';
+    if (!list.length) { grid.innerHTML = '<div class="state">No hay fotografías en esta categoría.</div>'; return; }
+
+    const desde = 'Desde ' + money.format(minPrice());
+    list.forEach((p, i) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'product';
+      card.style.animationDelay = (i % 12) * 50 + 'ms';
+      card.innerHTML = `
+        <div class="product__media wm">
+          <img loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async" draggable="false" alt="">
+          <span class="product__quick btn btn--primary btn--sm">Elegir formato</span>
+        </div>
+        <div class="product__info">
+          <span class="product__title"></span>
+          <span class="product__price">${desde}</span>
+        </div>`;
+      const img = card.querySelector('img');
+      img.src = p.img;
+      img.alt = p.titulo;
+      img.onerror = () => { card.style.display = 'none'; };
+      card.querySelector('.product__title').textContent = p.titulo;
+      card.addEventListener('click', () => openProduct(p));
+      grid.appendChild(card);
+    });
+  }
+
+  $('shop-filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    const cat = btn.dataset.category;
+    document.querySelectorAll('#shop-filters .chip').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    renderGrid(cat === 'Todas' ? products : products.filter(p => p.categoria === cat));
+  });
+
+  /* ---------- Modal de producto ---------- */
+  function openProduct(p) {
+    current = p;
+    sel = { formato: 'impresa', tamano: null, color: null, qty: 1 };
+
+    $('pm-img').src = p.img;
+    $('pm-img').alt = p.titulo;
+    $('pm-title').textContent = p.titulo;
+    $('pm-cat').textContent = p.categoria || 'Fotografía';
+    $('pm-desc').textContent = p.descripcion;
+    $('pm-desc').hidden = !p.descripcion;
+
+    // Formatos
+    $('pm-formats').innerHTML = Object.entries(CONFIG.FORMATOS).map(([key, f]) => `
+      <label class="opt">
+        <input type="radio" name="formato" value="${key}" ${key === sel.formato ? 'checked' : ''}>
+        <span class="opt__dot"></span>
+        <span class="opt__title">${f.nombre}</span>
+        <span class="opt__price">desde ${money.format(Math.min(...Object.values(f.tamanos)))}</span>
+        <span class="opt__desc">${f.desc}</span>
+      </label>`).join('');
+
+    $('pm-formats').querySelectorAll('input').forEach(r => r.addEventListener('change', () => {
+      sel.formato = r.value; sel.tamano = null; sel.color = null; renderOptions();
+    }));
+
+    renderOptions();
+
+    lastFocus = document.activeElement;
+    $('scrim').classList.add('is-open');
+    $('pmodal').classList.add('is-open');
+    lockScroll(true);
+    $('pm-close').focus();
+
+    try { history.replaceState(null, '', '?foto=' + encodeURIComponent(p.id)); } catch (e) {}
+  }
+
+  function renderOptions() {
+    const f = CONFIG.FORMATOS[sel.formato];
+    const sizes = Object.keys(f.tamanos);
+    if (!sel.tamano || !f.tamanos[sel.tamano]) sel.tamano = sizes[Math.min(1, sizes.length - 1)];
+
+    // Tamaños (se oculta si hay uno solo)
+    $('pm-size-group').hidden = sizes.length < 2;
+    $('pm-sizes').innerHTML = sizes.map(s => `
+      <label class="chip-radio">
+        <input type="radio" name="tamano" value="${s}" ${s === sel.tamano ? 'checked' : ''}>
+        <span>${s}</span>
+      </label>`).join('');
+    $('pm-sizes').querySelectorAll('input').forEach(r => r.addEventListener('change', () => { sel.tamano = r.value; updatePrice(); }));
+
+    // Colores de marco
+    const colores = f.colores || [];
+    $('pm-color-group').hidden = !colores.length;
+    if (colores.length && !sel.color) sel.color = colores[0].nombre;
+    $('pm-colors').innerHTML = colores.map(c => `
+      <label class="swatch">
+        <input type="radio" name="color" value="${c.nombre}" ${c.nombre === sel.color ? 'checked' : ''}>
+        <span class="swatch__color" style="background:${c.hex}"></span>
+        <span class="swatch__name">${c.nombre}</span>
+      </label>`).join('');
+    $('pm-colors').querySelectorAll('input').forEach(r => r.addEventListener('change', () => { sel.color = r.value; }));
+
+    $('pm-notes').innerHTML = (f.notas || []).map(n => `<li>${ICON_DOT}<span>${n}</span></li>`).join('');
+    updatePrice();
+  }
+
+  function unitPrice() { return CONFIG.FORMATOS[sel.formato].tamanos[sel.tamano] || 0; }
+  function updatePrice() {
+    $('pm-qty').textContent = sel.qty;
+    $('pm-price').textContent = money.format(unitPrice() * sel.qty);
+  }
+
+  $('pm-minus').addEventListener('click', () => { sel.qty = Math.max(1, sel.qty - 1); updatePrice(); });
+  $('pm-plus').addEventListener('click',  () => { sel.qty = Math.min(20, sel.qty + 1); updatePrice(); });
+
+  function closeProduct() {
+    if (!$('pmodal').classList.contains('is-open')) return;
+    $('pmodal').classList.remove('is-open');
+    if (!$('cart').classList.contains('is-open')) { $('scrim').classList.remove('is-open'); lockScroll(false); }
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+    if (lastFocus) lastFocus.focus();
+  }
+  $('pm-close').addEventListener('click', closeProduct);
+  $('pmodal').addEventListener('click', (e) => { if (e.target === $('pmodal')) closeProduct(); });
+
+  $('pm-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = CONFIG.FORMATOS[sel.formato];
+    const key = [current.id, sel.formato, sel.tamano, sel.color || ''].join('|');
+    const existing = cart.find(i => i.key === key);
+    if (existing) existing.qty = Math.min(20, existing.qty + sel.qty);
+    else cart.push({
+      key, id: current.id, titulo: current.titulo, img: current.img, link: current.link,
+      formato: f.nombre, tamano: Object.keys(f.tamanos).length > 1 ? sel.tamano : '',
+      color: sel.color || '', precio: unitPrice(), qty: sel.qty
+    });
+    saveCart();
+    closeProduct();
+    toast('Agregado al carrito');
+    const fab = $('cart-fab');
+    fab.classList.remove('is-bump'); void fab.offsetWidth; fab.classList.add('is-bump');
+  });
+
+  function openFromURL() {
+    const id = new URLSearchParams(location.search).get('foto');
+    if (!id) return;
+    const p = products.find(x => x.id === id);
+    if (p) openProduct(p);
+  }
+
+  /* ---------- Carrito ---------- */
+  function loadCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { return []; }
+  }
+  function saveCart() {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch (e) {}
+    renderCart();
+  }
+  function cartTotal() { return cart.reduce((s, i) => s + i.precio * i.qty, 0); }
+  function itemMeta(i) { return [i.formato, i.tamano, i.color && 'Marco ' + i.color.toLowerCase()].filter(Boolean).join(' · '); }
+
+  function renderCart() {
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    $('cart-count').textContent = count;
+    $('cart-total').textContent = money.format(cartTotal());
+    $('cart-foot').hidden = cart.length === 0;
+
+    const list = $('cart-items');
+    if (!cart.length) {
+      list.innerHTML = `<li class="cart__empty"><span>Tu carrito está vacío.</span><button class="btn btn--ghost btn--sm" onclick="closeCart()">Ver fotografías</button></li>`;
+      return;
+    }
+    list.innerHTML = '';
+    cart.forEach((i, idx) => {
+      const li = document.createElement('li');
+      li.className = 'cart-item';
+      li.innerHTML = `
+        <div class="cart-item__img wm"><img alt="" draggable="false"></div>
+        <div>
+          <div class="cart-item__title"></div>
+          <div class="cart-item__meta">${itemMeta(i)}</div>
+          <div class="qty qty--sm mt-4" aria-label="Cantidad">
+            <button type="button" data-act="minus" aria-label="Restar">−</button>
+            <output>${i.qty}</output>
+            <button type="button" data-act="plus" aria-label="Sumar">+</button>
+          </div>
+        </div>
+        <div class="cart-item__side">
+          <span class="cart-item__price">${money.format(i.precio * i.qty)}</span>
+          <button type="button" class="cart-item__remove" data-act="remove">Quitar</button>
+        </div>`;
+      li.querySelector('img').src = i.img;
+      li.querySelector('.cart-item__title').textContent = i.titulo;
+      li.addEventListener('click', (e) => {
+        const act = e.target.closest('[data-act]')?.dataset.act;
+        if (act === 'minus') i.qty = Math.max(1, i.qty - 1);
+        else if (act === 'plus') i.qty = Math.min(20, i.qty + 1);
+        else if (act === 'remove') cart.splice(idx, 1);
+        else return;
+        saveCart();
+      });
+      list.appendChild(li);
+    });
+  }
+
+  function openCart() {
+    $('cart').classList.add('is-open');
+    $('cart').setAttribute('aria-hidden', 'false');
+    $('scrim').classList.add('is-open');
+    lockScroll(true);
+    $('cart-close').focus();
+  }
+  function closeCart() {
+    $('cart').classList.remove('is-open');
+    $('cart').setAttribute('aria-hidden', 'true');
+    if (!$('pmodal').classList.contains('is-open')) { $('scrim').classList.remove('is-open'); lockScroll(false); }
+  }
+  $('cart-fab').addEventListener('click', openCart);
+  $('cart-close').addEventListener('click', closeCart);
+  $('scrim').addEventListener('click', () => { closeProduct(); closeCart(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeProduct(); closeCart(); } });
+
+  /* ---------- Checkout ---------- */
+  function orderText() {
+    const lines = cart.map(i =>
+      `• ${i.titulo} — ${itemMeta(i)} ×${i.qty} — ${money.format(i.precio * i.qty)}${i.link ? '\n  Ref: ' + i.link : ''}`
+    );
+    return `${lines.join('\n')}\n\nTotal: ${money.format(cartTotal())}`;
+  }
+  function buyer() {
+    return { nombre: $('co-name').value.trim(), email: $('co-email').value.trim() };
+  }
+
+  $('co-wa-btn').addEventListener('click', () => {
+    if (!cart.length) return;
+    const b = buyer();
+    const msg = `Hola Nicolás, quiero hacer este pedido de la tienda:\n\n${orderText()}` +
+      (b.nombre ? `\n\nNombre: ${b.nombre}` : '') + (b.email ? `\nEmail: ${b.email}` : '');
+    window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
+  });
+
+  $('co-email-btn').addEventListener('click', async () => {
+    if (!cart.length) return;
+    const b = buyer();
+    if (!b.nombre || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email)) {
+      toast('Completá tu nombre y un email válido.', false);
+      (!b.nombre ? $('co-name') : $('co-email')).focus();
+      return;
+    }
+    const btn = $('co-email-btn');
+    const original = btn.textContent;
+    btn.textContent = 'Enviando…';
+    btn.disabled = true;
+    try {
+      const res = await fetch(CONFIG.FORMSPREE, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: 'Nuevo pedido — Tienda',
+          nombre: b.nombre,
+          email: b.email,
+          total: money.format(cartTotal()),
+          message: `Pedido de ${b.nombre} (${b.email}):\n\n${orderText()}`
+        })
+      });
+      if (!res.ok) throw new Error();
+      cart = [];
+      saveCart();
+      closeCart();
+      toast('¡Pedido enviado! Te escribo para confirmar.');
+    } catch (e) {
+      toast('No se pudo enviar. Probá por WhatsApp.', false);
+    } finally {
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+  });
+
+  /* ---------- Inicio ---------- */
+  document.addEventListener('contextmenu', (e) => { if (e.target.closest('.wm, img')) e.preventDefault(); });
+  renderCart();
+  loadProducts();
+  </script>
+</body>
+</html>
