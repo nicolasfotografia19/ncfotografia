@@ -3,48 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nicolás Fotografía - Portafolio de fotografía editorial, arquitectura, retratos y estilo de vida. Mar del Plata, Argentina.">
+  <meta name="description" content="Portfolio de fotografía.">
   <meta name="theme-color" content="#0C0C0D">
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
-  <title>Nicolás Fotografía – Portafolio</title>
+  <title>Portfolio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=20261116d">
+  <link rel="stylesheet" href="/styles.css?v=2026111701">
+  <script src="/config.js?v=2026111701"></script>
+  <script src="/plantilla.js?v=2026111701"></script>
 </head>
 
-<body>
+<body data-page="portfolio">
   <div class="grain" aria-hidden="true"></div>
-
-  <!-- MENÚ -->
   <div id="menu-contenedor"></div>
 
-  <!-- CONTENIDO -->
   <main class="container">
-
     <header class="page-head">
-      <span class="eyebrow reveal">Diario visual · Portafolio</span>
+      <span class="eyebrow reveal" data-cfg="portfolio.etiqueta">Portafolio</span>
+      <h1 class="display reveal reveal--d1" data-cfg-titulo="portfolio">Portfolio</h1>
+      <p class="lead reveal reveal--d2" data-cfg="portfolio.bajada"></p>
 
-      <h1 class="display reveal reveal--d1">
-        Arquitectura, retratos y <em>atmósferas visuales.</em>
-      </h1>
-
-      <p class="lead reveal reveal--d2">
-        Una colección fotográfica pura basada en la luz natural,
-        los contrastes honestos y la estética documental.
-      </p>
-
-      <!-- FILTROS -->
-      <div id="filter-buttons" class="chips chips--scroll mt-4 reveal reveal--d3" role="group" aria-label="Filtrar por categoría">
-        <button onclick="filterPosts('Todas')"          data-category="Todas"          class="chip filter-btn" aria-pressed="true">Todas</button>
-        <button onclick="filterPosts('Arquitectura')"   data-category="Arquitectura"   class="chip filter-btn" aria-pressed="false">Arquitectura</button>
-        <button onclick="filterPosts('Retratos')"       data-category="Retratos"       class="chip filter-btn" aria-pressed="false">Retratos</button>
-        <button onclick="filterPosts('Estilo de vida')" data-category="Estilo de vida" class="chip filter-btn" aria-pressed="false">Estilo de vida</button>
-      </div>
+      <div id="filter-buttons" class="chips chips--scroll mt-4 reveal reveal--d3" role="group" aria-label="Filtrar por categoría"></div>
     </header>
 
-    <!-- LOADING -->
     <div id="loading-indicator" class="masonry" aria-label="Cargando galería">
       <div class="skeleton" style="height:420px"></div>
       <div class="skeleton" style="height:300px"></div>
@@ -54,71 +38,58 @@
       <div class="skeleton" style="height:320px"></div>
     </div>
 
-    <!-- ERROR -->
-    <div id="error-message" class="state state--error" hidden>
-      <span id="error-text"></span>
-    </div>
+    <div id="error-message" class="state state--error" hidden><span id="error-text"></span></div>
 
-    <!-- GALERÍA -->
     <div id="gallery-container" class="masonry" aria-live="polite"></div>
-
   </main>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <div class="site-footer__brand">
-        <a href="/index.html" class="brand" aria-label="Inicio">
-          <img src="/logo.svg" alt="" width="26" height="26">
-          <span class="brand__name">Nicolás Fotografía</span>
-        </a>
-        <p>Mar del Plata · Buenos Aires · Coberturas nacionales e internacionales.</p>
-      </div>
-      <nav class="site-footer__links" aria-label="Redes">
-        <a href="https://www.instagram.com/nicolas_calderon_fotografia" target="_blank" rel="noopener noreferrer">Instagram</a>
-        <a href="https://wa.me/5492236666629" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <a href="mailto:nicolascalderonfotografia@gmail.com">Email</a>
-        <span>© 2026</span>
-      </nav>
-    </div>
-  </footer>
+  <footer id="pie"></footer>
 
-  <!-- LIGHTBOX -->
+  <!-- Lightbox -->
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Fotografía ampliada">
     <button onclick="closeLightbox()" aria-label="Cerrar" class="icon-btn lightbox__close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
-
     <div id="lightbox-media-container" class="lightbox__media"></div>
-
     <div class="lightbox__meta">
       <p id="lightbox-caption" class="lightbox__caption"></p>
       <div class="row" style="justify-content:center">
-      <a id="lightbox-buy" href="/tienda.html" class="btn btn--primary btn--sm">
-        Ver la tienda
-        <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-      <a id="lightbox-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--sm">
-        Ver en Instagram
-      </a>
+        <a id="lightbox-buy" href="/tienda.html" class="btn btn--primary btn--sm">
+          Ver la tienda
+          <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a id="lightbox-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--sm">Ver en Instagram</a>
       </div>
     </div>
   </div>
 
-  <script src="/fetch-menu.js?v=20261116d"></script>
-  <script src="/proteccion.js?v=20261116d"></script>
-
-  <!-- GALERÍA -->
   <script>
-    const IG_API_URL =
-      'https://script.google.com/macros/s/AKfycbxBM4NG4tD2KjWuDO76ml20Ln96aKPKBYJBFT4ToKNwYNRQVuEVbniImYW_9GcSuaXA2Q/exec';
-
+    const IG_API_URL = SITE.integraciones.instagramApi;
+    const CATEGORIAS = SITE.portfolio.categorias || [];
     const POSTS_PER_BATCH = 9;
 
     let allPosts = [];
     let currentPosts = [];
     let renderedCount = 0;
     let loadMoreObserver = null;
+
+    // Filtros desde la configuración
+    (function () {
+      const box = document.getElementById('filter-buttons');
+      if (!CATEGORIAS.length) { box.hidden = true; return; }
+      ['Todas', ...CATEGORIAS].forEach((c, i) => {
+        const b = document.createElement('button');
+        b.className = 'chip filter-btn';
+        b.dataset.category = c;
+        b.setAttribute('aria-pressed', String(i === 0));
+        b.textContent = c;
+        b.onclick = () => filterPosts(c);
+        box.appendChild(b);
+      });
+    })();
+
+    // Botón a la tienda solo si la tienda está activa
+    if (!SITE.util.activa('tienda')) document.getElementById('lightbox-buy').hidden = true;
 
     /* ---------- Cargar (JSONP para evitar CORS de Apps Script) ---------- */
     function loadGallery() {
@@ -128,14 +99,10 @@
       const callbackName = '__instagramGallery_' + Date.now();
       const script = document.createElement('script');
 
-      function cleanup() {
-        try { delete window[callbackName]; script.remove(); } catch (e) {}
-      }
-      function fail(msg) {
-        loading.style.display = 'none';
-        errorText.textContent = msg;
-        errorBox.hidden = false;
-      }
+      function cleanup() { try { delete window[callbackName]; script.remove(); } catch (e) {} }
+      function fail(msg) { loading.style.display = 'none'; errorText.textContent = msg; errorBox.hidden = false; }
+
+      if (!IG_API_URL) { fail('Falta configurar el feed de Instagram (integraciones.instagramApi en config.js).'); return; }
 
       window[callbackName] = function (data) {
         try {
@@ -152,10 +119,7 @@
 
       script.src = IG_API_URL + '?callback=' + encodeURIComponent(callbackName) + '&_=' + Date.now();
       script.async = true;
-      script.onerror = function () {
-        cleanup();
-        fail('No se pudo conectar con Google Apps Script.');
-      };
+      script.onerror = function () { cleanup(); fail('No se pudo conectar con la galería.'); };
       document.head.appendChild(script);
     }
 
@@ -190,13 +154,11 @@
         item.setAttribute('aria-label', 'Ampliar fotografía');
         item.style.animationDelay = (localIndex * 60) + 'ms';
         item.onclick = function () { openLightbox(post); };
-        item.onkeydown = function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(post); }
-        };
+        item.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(post); } };
 
         const img = document.createElement('img');
         img.src = imgUrl;
-        img.alt = post.caption ? post.caption.substring(0, 80) : 'Fotografía de Nicolás';
+        img.alt = post.caption ? post.caption.substring(0, 80) : 'Fotografía de ' + SITE.marca.nombre;
         img.loading = index < 2 ? 'eager' : 'lazy';
         img.fetchPriority = index < 2 ? 'high' : 'low';
         img.decoding = 'async';
@@ -219,7 +181,6 @@
       });
 
       renderedCount += nextPosts.length;
-
       if (renderedCount < currentPosts.length) createLoadMoreTrigger(container);
     }
 
@@ -227,13 +188,11 @@
     function createLoadMoreTrigger(container) {
       const oldTrigger = document.getElementById('load-more-trigger');
       if (oldTrigger) oldTrigger.remove();
-
       const trigger = document.createElement('div');
       trigger.id = 'load-more-trigger';
       trigger.style.height = '1px';
       trigger.style.width = '100%';
       container.appendChild(trigger);
-
       loadMoreObserver = new IntersectionObserver(function (entries) {
         if (entries[0].isIntersecting) {
           loadMoreObserver.disconnect();
@@ -241,7 +200,6 @@
           renderPosts(currentPosts, false);
         }
       }, { rootMargin: '1000px 0px' });
-
       loadMoreObserver.observe(trigger);
     }
 
@@ -250,9 +208,7 @@
       document.querySelectorAll('.filter-btn').forEach(function (button) {
         button.setAttribute('aria-pressed', String(button.dataset.category === category));
       });
-
       if (category === 'Todas') { renderPosts(allPosts, true); return; }
-
       const filtered = allPosts.filter(function (post) {
         return (post.caption || '').toLowerCase().includes(category.toLowerCase());
       });
@@ -276,7 +232,7 @@
       media.appendChild(image);
 
       document.getElementById('lightbox-caption').textContent = post.caption || '';
-      document.getElementById('lightbox-link').href = post.permalink || '#';
+      document.getElementById('lightbox-link').href = post.permalink || SITE.contacto.instagram || '#';
 
       lastFocus = document.activeElement;
       lightbox.classList.add('is-open');
@@ -293,40 +249,13 @@
       if (lastFocus) lastFocus.focus();
     }
 
-    // Cerrar con clic fuera de la foto
     document.getElementById('lightbox').addEventListener('click', function (e) {
       if (e.target === this || e.target.id === 'lightbox-media-container') closeLightbox();
     });
-
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') closeLightbox();
-    });
+    document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeLightbox(); });
 
     loadGallery();
   </script>
-
-  <!-- Bloquear clic derecho -->
-  <script>
-    document.addEventListener('contextmenu', function (event) { event.preventDefault(); });
-  </script>
-
-  <!-- Sentry (se carga después de todo) -->
-  <script>
-    window.addEventListener('load', function () {
-      const script = document.createElement('script');
-      script.src = 'https://browser.sentry-cdn.com/7.100.0/bundle.min.js';
-      script.crossOrigin = 'anonymous';
-      script.onload = function () {
-        if (typeof Sentry !== 'undefined') {
-          Sentry.init({
-            dsn: 'https://aa1a112752bd8b5e25dfec3fd75b0eb8@o4512092368142336.ingest.us.sentry.io/4512096924860416',
-            environment: 'production',
-            tracesSampleRate: 0.1
-          });
-        }
-      };
-      document.head.appendChild(script);
-    });
-  </script>
+  <script src="/proteccion.js?v=2026111701"></script>
 </body>
 </html>

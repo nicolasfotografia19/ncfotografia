@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nicolás Fotografía - Galería protegida para selección de fotografías de eventos y clientes.">
+  <meta name="description" content="Fotografía.">
   <meta name="theme-color" content="#0C0C0D">
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
-  <title>Nicolás Fotografía — Selección cliente</title>
+  <title>Fotografía</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=20261116d">
-
-  <script src="https://js.sentry-cdn.com/aa1a112752bd8b5e25dfec3fd75b0eb8.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/styles.css?v=2026111701">
+  <script src="/config.js?v=2026111701"></script>
+  <script src="/plantilla.js?v=2026111701"></script>
 </head>
 
-<body style="padding-bottom: 6rem">
+<body data-page="seleccion" style="padding-bottom: 6rem">
   <div class="grain" aria-hidden="true"></div>
   <div id="menu-contenedor"></div>
 
@@ -26,24 +26,15 @@
       <!-- Cabecera -->
       <header class="page-head page-head--split">
         <div style="display:grid; gap: var(--space-5)">
-          <span class="eyebrow reveal">Acceso exclusivo cliente</span>
-          <h1 class="display reveal reveal--d1">Selección <em>cliente</em></h1>
-          <p class="lead reveal reveal--d2">
-            Galería protegida con marca de agua. Marcá las fotografías que quieras y enviámelas
-            por WhatsApp o email para comenzar la edición final.
-          </p>
+          <span class="eyebrow reveal" data-cfg="seleccion.etiqueta"></span>
+          <h1 class="display reveal reveal--d1" data-cfg-titulo="seleccion"></h1>
+          <p class="lead reveal reveal--d2" data-cfg="seleccion.bajada"></p>
         </div>
 
         <!-- Categorías -->
         <div class="reveal reveal--d3" style="display:grid; gap: var(--space-3); min-width: 0">
           <span class="label">Jornada / evento</span>
-          <nav id="event-categories" class="segmented segmented--scroll" aria-label="Categorías de eventos">
-            <button data-category="trackday"  class="chip event-btn is-active" aria-pressed="true">Trackday Argentina</button>
-            <button data-category="speedclub" class="chip event-btn" aria-pressed="false">Speed Club</button>
-            <button data-category="drift"     class="chip event-btn" aria-pressed="false">Drift</button>
-            <button data-category="autos"     class="chip event-btn" aria-pressed="false">Autos</button>
-            <button data-category="otras"     class="chip event-btn" aria-pressed="false">Otras fotos</button>
-          </nav>
+          <nav id="event-categories" class="segmented segmented--scroll" aria-label="Categorías de eventos"></nav>
         </div>
       </header>
 
@@ -74,29 +65,26 @@
     </div>
   </div>
 
-  <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <div class="site-footer__brand">
-        <a href="/index.html" class="brand" aria-label="Inicio">
-          <img src="/logo.svg" alt="" width="26" height="26">
-          <span class="brand__name">Nicolás Fotografía</span>
-        </a>
-        <p>Galería para elección y aprobación de imágenes de clientes.</p>
-      </div>
-      <nav class="site-footer__links" aria-label="Soporte">
-        <a href="https://wa.me/5492236666629" target="_blank" rel="noopener noreferrer">Soporte selección</a>
-        <span>© 2026 Nicolás Fotografía</span>
-      </nav>
-    </div>
-  </footer>
-
-  <script src="/fetch-menu.js?v=20261116d"></script>
-  <script src="/proteccion.js?v=20261116d"></script>
+  <footer id="pie"></footer>
+  <script src="/proteccion.js?v=2026111701"></script>
 
   <script>
-    const GOOGLE_APPS_SCRIPT_BASE = "https://script.google.com/macros/s/AKfycbwnghAiGw4rTojBX0bHsszpDxY1jibc-r25JioX8BODrh7sJwXcQMgzolbhssJE3zqD9w/exec";
-    const FORMSPREE_ENDPOINT = "https://formspree.io/f/xwlkwdye";
-    const WHATSAPP_PHONE = "5492236666629";
+    const GOOGLE_APPS_SCRIPT_BASE = SITE.integraciones.seleccionApi;
+    const FORMSPREE_ENDPOINT = SITE.integraciones.formspree;
+    const WHATSAPP_PHONE = SITE.contacto.whatsapp;
+
+    // Botones de eventos desde la configuración
+    (function () {
+      const nav = document.getElementById('event-categories');
+      (SITE.seleccion.eventos || []).forEach((ev, i) => {
+        const b = document.createElement('button');
+        b.className = 'chip event-btn' + (i === 0 ? ' is-active' : '');
+        b.dataset.category = ev.id;
+        b.setAttribute('aria-pressed', String(i === 0));
+        b.textContent = ev.nombre;
+        nav.appendChild(b);
+      });
+    })();
 
     const ICON_OK  = '<svg viewBox="0 0 24 24" fill="none" stroke="#8FD3A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
     const ICON_ERR = '<svg viewBox="0 0 24 24" fill="none" stroke="#F2A0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6l12 12"/></svg>';
@@ -124,7 +112,7 @@
       const selected = document.querySelectorAll('.selection-checkbox:checked');
       if (selected.length === 0) return;
       const textList = Array.from(selected).map(cb => `• ${cb.value}`).join('\n');
-      const message = `Hola Nicolás, he seleccionado las siguientes fotografías:\n\n${textList}\n\nQuedo a la espera para coordinar. ¡Muchas gracias!`;
+      const message = `Hola ${SITE.marca.nombre}, he seleccionado las siguientes fotografías:\n\n${textList}\n\nQuedo a la espera para coordinar. ¡Muchas gracias!`;
       window.open(`https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
     }
 

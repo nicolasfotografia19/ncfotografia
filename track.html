@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nicolás Fotografía - Solicitá tus fotografías de Track Days y jornadas en pista.">
+  <meta name="description" content="Fotografía.">
   <meta name="theme-color" content="#0C0C0D">
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
-  <title>Nicolás Fotografía — ¿Tenés fotos de mi auto?</title>
+  <title>Fotografía</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=20261116d">
-
-  <script src="https://js.sentry-cdn.com/aa1a112752bd8b5e25dfec3fd75b0eb8.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/styles.css?v=2026111701">
+  <script src="/config.js?v=2026111701"></script>
+  <script src="/plantilla.js?v=2026111701"></script>
 </head>
 
-<body>
+<body data-page="autos">
   <div class="grain" aria-hidden="true"></div>
   <div id="menu-contenedor"></div>
 
@@ -25,12 +25,9 @@
 
       <!-- Información -->
       <div class="split__aside split__aside--sticky">
-        <span class="eyebrow reveal">Automovilismo & track days</span>
-        <h1 class="display reveal reveal--d1 mt-5">¿Tenés fotos de <em>mi auto?</em></h1>
-        <p class="lead reveal reveal--d2 mt-5">
-          Si participaste en una tanda en San Nicolás, Buenos Aires, Speed Club o Drift,
-          ingresá los datos de tu auto y número para rastrear todas tus tomas en pista.
-        </p>
+        <span class="eyebrow reveal" data-cfg="autos.etiqueta"></span>
+        <h1 class="display reveal reveal--d1 mt-5" data-cfg-titulo="autos"></h1>
+        <p class="lead reveal reveal--d2 mt-5" data-cfg="autos.bajada"></p>
 
         <div class="card card--quiet card--interactive reveal reveal--d3 mt-7">
           <span class="label">¿Búsqueda urgente?</span>
@@ -38,7 +35,7 @@
             También podés enviarme directamente una foto de tu auto por WhatsApp para ubicarlo
             de inmediato en las carpetas de la tanda.
           </p>
-          <a href="https://wa.me/5492235468630" target="_blank" rel="noopener noreferrer" class="link">
+          <a data-cfg-link="whatsappAutos" target="_blank" rel="noopener noreferrer" class="link">
             Contactar por WhatsApp
             <svg class="btn__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
@@ -51,7 +48,7 @@
           <h2 class="h3">Solicitá tus fotos</h2>
           <p class="muted" style="font-size: var(--fs-small)">Te respondo por email con el material encontrado.</p>
 
-          <form id="track-form" action="https://formspree.io/f/xwlkwdye" method="POST" class="form" style="margin-top: var(--space-6)">
+          <form id="track-form" action="" method="POST" class="form" style="margin-top: var(--space-6)">
 
             <div class="field">
               <label for="name" class="field__label">Nombre completo</label>
@@ -68,11 +65,6 @@
               <div class="select-wrap">
                 <select id="event" name="event" required class="select">
                   <option value="" disabled selected>Seleccioná una jornada</option>
-                  <option value="Track Day San Nicolás">Track Day San Nicolás</option>
-                  <option value="Track Day Buenos Aires">Track Day Buenos Aires</option>
-                  <option value="Speed Club">Speed Club</option>
-                  <option value="Drift Sudamérica">Drift</option>
-                  <option value="Otro">Otro evento</option>
                 </select>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
               </div>
@@ -97,27 +89,17 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <div class="site-footer__brand">
-        <a href="/index.html" class="brand" aria-label="Inicio">
-          <img src="/logo.svg" alt="" width="26" height="26">
-          <span class="brand__name">Nicolás Fotografía</span>
-        </a>
-        <p>Coberturas fotográficas automotrices y jornadas en autódromos nacionales.</p>
-      </div>
-      <nav class="site-footer__links" aria-label="Contacto">
-        <a href="https://wa.me/5492235468630" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <span>© 2026</span>
-      </nav>
-    </div>
-  </footer>
-
-  <script src="/fetch-menu.js?v=20261116d"></script>
-  <script src="/proteccion.js?v=20261116d"></script>
+  <footer id="pie"></footer>
+  <script src="/proteccion.js?v=2026111701"></script>
 
   <script>
     const form = document.getElementById('track-form');
+    form.action = SITE.integraciones.formspree;
+    (SITE.autos.eventos || []).forEach((ev) => {
+      const o = document.createElement('option');
+      o.value = ev; o.textContent = ev;
+      document.getElementById('event').appendChild(o);
+    });
     const statusDiv = document.getElementById('form-status');
     const submitBtn = document.getElementById('submit-btn');
 

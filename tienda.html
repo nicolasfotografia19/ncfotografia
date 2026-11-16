@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nicolás Fotografía - Tienda de fotografías: archivos digitales, impresiones y cuadros con marco. Mar del Plata, Argentina.">
+  <meta name="description" content="Fotografía.">
   <meta name="theme-color" content="#0C0C0D">
   <link rel="icon" type="image/svg+xml" href="/logo.svg">
-  <title>Nicolás Fotografía — Tienda</title>
+  <title>Fotografía</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=20261116d">
-
-  <script src="https://js.sentry-cdn.com/aa1a112752bd8b5e25dfec3fd75b0eb8.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/styles.css?v=2026111701">
+  <script src="/config.js?v=2026111701"></script>
+  <script src="/plantilla.js?v=2026111701"></script>
 </head>
 
-<body style="padding-bottom: 5rem">
+<body data-page="tienda" style="padding-bottom: 5rem">
   <div class="grain" aria-hidden="true"></div>
   <div id="menu-contenedor"></div>
 
@@ -25,12 +25,9 @@
     <!-- Cabecera -->
     <header class="page-head page-head--split">
       <div style="display:grid; gap: var(--space-5)">
-        <span class="eyebrow reveal">Tienda · Prints & digitales</span>
-        <h1 class="display reveal reveal--d1">Llevate una <em>fotografía.</em></h1>
-        <p class="lead reveal reveal--d2">
-          Cada imagen está disponible como archivo digital, impresión o cuadro con marco listo para colgar.
-          Elegí la foto, el formato y el tamaño.
-        </p>
+        <span class="eyebrow reveal" data-cfg="tienda.etiqueta"></span>
+        <h1 class="display reveal reveal--d1" data-cfg-titulo="tienda"></h1>
+        <p class="lead reveal reveal--d2" data-cfg="tienda.bajada"></p>
       </div>
 
       <div id="shop-filters-wrap" class="reveal reveal--d3" style="display:grid; gap: var(--space-3); min-width:0" hidden>
@@ -46,22 +43,7 @@
 
   </main>
 
-  <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <div class="site-footer__brand">
-        <a href="/index.html" class="brand" aria-label="Inicio">
-          <img src="/logo.svg" alt="" width="26" height="26">
-          <span class="brand__name">Nicolás Fotografía</span>
-        </a>
-        <p>Impresiones y archivos digitales. Envíos a todo el país desde Mar del Plata.</p>
-      </div>
-      <nav class="site-footer__links" aria-label="Contacto">
-        <a href="https://wa.me/5492236666629" target="_blank" rel="noopener noreferrer">Consultas por WhatsApp</a>
-        <a href="mailto:nicolascalderonfotografia@gmail.com">Email</a>
-        <span>© 2026</span>
-      </nav>
-    </div>
-  </footer>
+  <footer id="pie"></footer>
 
   <!-- Botón carrito -->
   <button id="cart-fab" class="cart-fab" aria-label="Abrir carrito" aria-controls="cart">
@@ -161,46 +143,18 @@
     <div id="toast-icon"></div>
     <p id="toast-text"></p>
   </div>
-
-  <script src="/fetch-menu.js?v=20261116d"></script>
-  <script src="/proteccion.js?v=20261116d"></script>
+  <script src="/proteccion.js?v=2026111701"></script>
 
   <script>
   /* =========================================================
-     CONFIGURACIÓN DE LA TIENDA — editá precios y textos acá
+     Los precios y textos de la tienda se editan en config.js (tienda.formatos)
      ========================================================= */
   const CONFIG = {
-    // URL de la implementación del Apps Script de la tienda (tienda-apps-script.gs)
-    TIENDA_API_URL: 'https://script.google.com/macros/s/AKfycbzMnSw7q8h7nLTn54FCn0rIFxcFDBSq6pMetpQoijQpzLwN0nJQIH5UoaTYrBNwaYVd/exec',
-    FORMSPREE: 'https://formspree.io/f/xwlkwdye',
-    WHATSAPP: '5492236666629',
-    MONEDA: 'ARS',
-
-    FORMATOS: {
-      digital: {
-        nombre: 'Digital',
-        desc: 'Archivo JPG en alta resolución, sin marca de agua. Uso personal.',
-        tamanos: { 'Alta resolución': 17000 },
-        notas: ['Entrega por email', 'Sin costo de envío']
-      },
-      impresa: {
-        nombre: 'Impresa',
-        desc: 'Impresión profesional en papel fotográfico premium, lista para enmarcar.',
-        tamanos: { '20 × 30 cm': 28500, '30 × 45 cm': 45500, '40 × 60 cm': 68000 },
-        notas: ['Envíos a todo el país o retiro en Mar del Plata', 'Embalaje rígido protegido']
-      },
-      marco: {
-        nombre: 'Impresa con marco',
-        desc: 'Impresión profesional con marco de madera y vidrio, lista para colgar.',
-        tamanos: { '20 × 30 cm': 51000, '30 × 45 cm': 79500, '40 × 60 cm': 113500 },
-        colores: [
-          { nombre: 'Negro',         hex: '#151515' },
-          { nombre: 'Blanco',        hex: '#EDEBE6' },
-          { nombre: 'Madera natural', hex: '#B38A5E' }
-        ],
-        notas: ['Envíos a todo el país o retiro en Mar del Plata', 'Incluye gancho para colgar']
-      }
-    }
+    TIENDA_API_URL: SITE.integraciones.tiendaApi,
+    FORMSPREE: SITE.integraciones.formspree,
+    WHATSAPP: SITE.contacto.whatsapp,
+    MONEDA: SITE.tienda.moneda || 'ARS',
+    FORMATOS: SITE.tienda.formatos
   };
 
   /* ========================================================= */
@@ -534,7 +488,7 @@
   $('co-wa-btn').addEventListener('click', () => {
     if (!cart.length) return;
     const b = buyer();
-    const msg = `Hola Nicolás, quiero hacer este pedido de la tienda:\n\n${orderText()}` +
+    const msg = `Hola ${SITE.marca.nombre}, quiero hacer este pedido de la tienda:\n\n${orderText()}` +
       (b.nombre ? `\n\nNombre: ${b.nombre}` : '') + (b.email ? `\nEmail: ${b.email}` : '');
     window.open(`https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank');
   });

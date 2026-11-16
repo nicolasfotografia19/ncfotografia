@@ -1,0 +1,3 @@
+# Cloudflare Pages: config.js siempre se revalida, así los cambios de un cliente se ven al instante
+/config.js
+  Cache-Control: no-cache
