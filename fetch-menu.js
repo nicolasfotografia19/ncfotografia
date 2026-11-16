@@ -61,7 +61,7 @@
     if (cached) { render(cached); return; }
 
     try {
-      const res = await fetch('/menu.html?v=20261116b', { cache: 'no-cache' });
+      const res = await fetch('/menu.html?v=20261116c', { cache: 'no-cache' });
       if (!res.ok) throw new Error('Menú no disponible');
       const html = await res.text();
       try { sessionStorage.setItem(CACHE_KEY, html); } catch (e) {}
